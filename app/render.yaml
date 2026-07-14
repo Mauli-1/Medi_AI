@@ -1,0 +1,27 @@
+services:
+  - type: web
+    name: msms
+    runtime: python
+    plan: free
+    buildCommand: |
+      (apt-get update && apt-get install -y --no-install-recommends \
+        tesseract-ocr \
+        libpango-1.0-0 \
+        libpangoft2-1.0-0 \
+        libpangocairo-1.0-0 \
+        libcairo2 \
+        libgdk-pixbuf2.0-0 \
+        libffi-dev \
+        shared-mime-info) || echo "apt-get unavailable in this build environment, skipping system packages"
+      pip install --upgrade pip
+      pip install -r requirements.txt
+    startCommand: gunicorn -w 2 -b 0.0.0.0:$PORT wsgi:application
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: SECRET_KEY
+        generateValue: true
+      - key: PROD_DATABASE_URL
+        sync: false
+      - key: PYTHON_VERSION
+        value: 3.11.9
