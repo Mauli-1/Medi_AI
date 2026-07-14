@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h5 class="mb-0 fw-bold">{{ rx.prescription_code }} <span class="badge {% if rx.status=='verified' %}bg-success{% elif rx.status=='dispensed' %}bg-primary{% else %}bg-secondary{% endif %}">{{ rx.status|capitalize }}</span></h5>
+    <p class="text-muted mb-0 small">{{ rx.patient.full_name if rx.patient else '—' }} · Dr. {{ rx.doctor.full_name if rx.doctor else '—' }} · {{ rx.rx_date.strftime('%d-%m-%Y') if rx.rx_date else '' }}</p>
+  </div>
+  <div class="d-flex gap-2">
+    {% if not rx.is_verified %}
+    <form method="post" action="{{ url_for('prescriptions.verify', rx_id=rx.id) }}"><button class="btn btn-sm btn-outline-primary">Verify</button></form>
+    {% endif %}
+    <form method="post" action="{{ url_for('prescriptions.bill', rx_id=rx.id) }}"><button class="btn btn-sm btn-accent">Bill Now</button></form>
+    <a href="{{ url_for('prescriptions.index') }}" class="btn btn-sm btn-outline-secondary">← Back</a>
+  </div>
+</div>
+
+{% if rx.image_path %}
+<div class="card mb-3">
+  <div class="card-body">
+    <h6 class="fw-bold mb-2">Prescription Image</h6>
+    <img src="{{ url_for('static', filename=rx.image_path) }}" style="max-width:400px" class="border rounded">
+  </div>
+</div>
+{% endif %}
+
+<div class="card mb-3">
+  <div class="card-body">
+    <h6 class="fw-bold mb-3">Medicines</h6>
+    <table class="table table-sm mb-3">
+      <thead class="table-light"><tr><th>Medicine</th><th>Dosage</th><th>Duration</th><th class="text-end">Qty</th><th class="text-end">Dispensed</th></tr></thead>
+      <tbody>
+        {% for item in rx.items %}
+        <tr>
+          <td>{{ item.medicine.name if item.medicine else item.generic_name }}</td>
+          <td class="small">{{ item.dosage or '—' }}</td>
+          <td class="small">{{ item.duration or '—' }}</td>
+          <td class="text-end">{{ item.quantity or 0 }}</td>
+          <td class="text-end">{{ item.dispensed_qty or 0 }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5" class="text-center text-muted py-3">No medicines added yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <form method="post" action="{{ url_for('prescriptions.add_item', rx_id=rx.id) }}" class="row g-2 align-items-end">
+      <div class="col-md-4">
+        <label class="form-label small mb-0">Medicine</label>
+        <select name="medicine_id" class="form-select form-select-sm">
+          <option value="">-- Select --</option>
+          {% for m in medicines %}<option value="{{ m.id }}">{{ m.name }}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="col-md-2">
+        <label class="form-label small mb-0">Dosage</label>
+        <input type="text" name="dosage" class="form-control form-control-sm" placeholder="1 tab BD">
+      </div>
+      <div class="col-md-2">
+        <label class="form-label small mb-0">Duration</label>
+        <input type="text" name="duration" class="form-control form-control-sm" placeholder="5 days">
+      </div>
+      <div class="col-md-2">
+        <label class="form-label small mb-0">Quantity</label>
+        <input type="number" name="quantity" class="form-control form-control-sm" value="1">
+      </div>
+      <div class="col-md-2">
+        <button class="btn btn-sm btn-outline-secondary w-100">+ Add</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% if rx.notes %}
+<div class="alert alert-secondary small">{{ rx.notes }}</div>
+{% endif %}
+{% endblock %}

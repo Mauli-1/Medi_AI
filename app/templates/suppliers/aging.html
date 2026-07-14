@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% block title %}Aging Report – {{ supplier.name }}{% endblock %}
+{% block topbar_title %}Aging Report{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-3">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+      <h4 class="mb-0 fw-bold">Aging Report – {{ supplier.name }}</h4>
+      <small class="text-muted">Outstanding dues grouped by age (days overdue)</small>
+    </div>
+    <div class="d-flex gap-2">
+      <a href="{{ url_for('suppliers.ledger', supplier_id=supplier.id) }}" class="btn btn-outline-info btn-sm">Ledger</a>
+      <a href="{{ url_for('suppliers.index') }}" class="btn btn-outline-secondary btn-sm">Back</a>
+      <button onclick="window.print()" class="btn btn-outline-primary btn-sm">Print</button>
+    </div>
+  </div>
+
+  <!-- Summary buckets -->
+  <div class="row g-3 mb-4">
+    {% set bucket_labels = [('0_30', '0–30 Days', 'success'), ('31_60', '31–60 Days', 'warning'), ('61_90', '61–90 Days', 'orange'), ('91_plus', '91+ Days', 'danger')] %}
+    {% for key, label, color in bucket_labels %}
+    <div class="col-md-3">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body text-center py-3">
+          <div class="text-muted small mb-1">{{ label }}</div>
+          <div class="fw-bold fs-5 text-{{ color }}">₹{{ '%.2f' % totals[key] }}</div>
+          <div class="text-muted" style="font-size:.75rem;">{{ buckets[key] | length }} bill(s)</div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- Grand total -->
+  <div class="alert alert-warning d-flex justify-content-between align-items-center mb-4">
+    <span class="fw-bold">Total Outstanding:</span>
+    <span class="fw-bold fs-5">₹{{ '%.2f' % grand_total }}</span>
+  </div>
+
+  <!-- Bucket tables -->
+  {% for key, label, color in bucket_labels %}
+    {% if buckets[key] %}
+    <div class="card border-0 shadow-sm mb-3">
+      <div class="card-header bg-white border-bottom fw-semibold d-flex justify-content-between">
+        <span class="text-{{ color }}">{{ label }}</span>
+        <span>₹{{ '%.2f' % totals[key] }}</span>
+      </div>
+      <div class="card-body p-0">
+        <table class="table table-sm table-hover mb-0">
+          <thead class="table-light">
+            <tr>
+              <th>Bill Number</th>
+              <th>Bill Date</th>
+              <th class="text-end">Due Amount</th>
+              <th class="text-end">Age (days)</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for e in buckets[key] %}
+            <tr>
+              <td class="font-monospace">{{ e.bill_number }}</td>
+              <td>{{ e.bill_date.strftime('%d-%m-%Y') }}</td>
+              <td class="text-end fw-semibold">₹{{ '%.2f' % e.due }}</td>
+              <td class="text-end">
+                <span class="badge bg-{{ color }}-subtle text-{{ color }} border">{{ e.age }} days</span>
+              </td>
+              <td>
+                <a href="{{ url_for('purchase.index') }}?q={{ e.bill_number }}" class="btn btn-sm btn-outline-primary">View</a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    {% endif %}
+  {% endfor %}
+
+  {% if grand_total == 0 %}
+  <div class="text-center py-5 text-muted">
+    <p class="fs-5">No outstanding dues.</p>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

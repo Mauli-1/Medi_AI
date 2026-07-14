@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h5 class="mb-0 fw-bold">{{ title }}</h5>
+  <a href="{{ url_for('branches.index') }}" class="btn btn-sm btn-outline-secondary">← Back</a>
+</div>
+<form method="post">
+  <div class="card mb-3">
+    <div class="card-body row g-3">
+      <div class="col-md-6">
+        <label class="form-label small">Branch Name *</label>
+        <input type="text" name="name" class="form-control form-control-sm" value="{{ branch.name if branch else '' }}" required>
+      </div>
+      {% if not branch %}
+      <div class="col-md-3">
+        <label class="form-label small">Branch Code *</label>
+        <input type="text" name="code" class="form-control form-control-sm" required>
+      </div>
+      {% endif %}
+      <div class="col-md-3">
+        <label class="form-label small">Phone</label>
+        <input type="text" name="phone" class="form-control form-control-sm" value="{{ branch.phone if branch else '' }}">
+      </div>
+      <div class="col-md-4">
+        <label class="form-label small">Email</label>
+        <input type="email" name="email" class="form-control form-control-sm" value="{{ branch.email if branch else '' }}">
+      </div>
+      <div class="col-md-8">
+        <label class="form-label small">Address</label>
+        <input type="text" name="address_line1" class="form-control form-control-sm" value="{{ branch.address_line1 if branch else '' }}">
+      </div>
+      <div class="col-md-4">
+        <label class="form-label small">City</label>
+        <input type="text" name="city" class="form-control form-control-sm" value="{{ branch.city if branch else '' }}">
+      </div>
+      <div class="col-md-4">
+        <label class="form-label small">State</label>
+        <input type="text" name="state" class="form-control form-control-sm" value="{{ branch.state if branch else '' }}">
+      </div>
+      <div class="col-md-4">
+        <label class="form-label small">Pincode</label>
+        <input type="text" name="pincode" class="form-control form-control-sm" value="{{ branch.pincode if branch else '' }}">
+      </div>
+      <div class="col-md-4">
+        <label class="form-label small">Manager Name</label>
+        <input type="text" name="manager_name" class="form-control form-control-sm" value="{{ branch.manager_name if branch else '' }}">
+      </div>
+      <div class="col-md-4">
+        <label class="form-label small">Manager Phone</label>
+        <input type="text" name="manager_phone" class="form-control form-control-sm" value="{{ branch.manager_phone if branch else '' }}">
+      </div>
+      <div class="col-md-4">
+        <label class="form-label small">GSTIN (if different)</label>
+        <input type="text" name="gstin" class="form-control form-control-sm" value="{{ branch.gstin if branch else '' }}">
+      </div>
+      <div class="col-md-6">
+        <label class="form-label small">Drug License No. (if different)</label>
+        <input type="text" name="drug_license_no" class="form-control form-control-sm" value="{{ branch.drug_license_no if branch else '' }}">
+      </div>
+      {% if branch %}
+      <div class="col-12">
+        <div class="form-check">
+          <input type="checkbox" name="is_active" class="form-check-input" id="isActive" {% if branch.is_active %}checked{% endif %}>
+          <label class="form-check-label small" for="isActive">Active</label>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+  <button class="btn btn-accent">{{ 'Save Changes' if branch else 'Add Branch' }}</button>
+</form>
+{% endblock %}

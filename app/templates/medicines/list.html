@@ -1,0 +1,206 @@
+{% extends 'base.html' %}
+
+{% block title %}Medicine Master{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css"/>
+<style>
+.schedule-badge { font-size: .7rem; font-weight: 700; padding: .2rem .45rem; border-radius: 4px; }
+.badge-H   { background:#FF8C00; color:#fff; }
+.badge-H1  { background:#D32F2F; color:#fff; }
+.badge-X   { background:#6A1A1A; color:#fff; }
+.badge-G   { background:#1565C0; color:#fff; }
+.badge-OTC { background:#2E7D32; color:#fff; }
+.badge-P   { background:#6A1A6A; color:#fff; }
+.stock-low { color: #D32F2F; font-weight:600; }
+.stock-ok  { color: #2E7D32; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <h4 class="mb-0 fw-700">Medicine Master</h4>
+    <small class="text-muted">Manage your medicine catalogue</small>
+  </div>
+  <div class="d-flex gap-2">
+    <!-- CSV Import -->
+    <form method="post" action="{{ url_for('medicines.import_csv') }}" enctype="multipart/form-data" class="d-flex gap-2" id="importForm">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+      <input type="file" name="csv_file" accept=".csv" class="form-control form-control-sm" style="max-width:200px" onchange="document.getElementById('importForm').submit()"/>
+      <label class="btn btn-sm btn-outline-secondary">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+          <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
+          <path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708l3-3z"/>
+        </svg>
+        Import CSV
+      </label>
+    </form>
+    <a href="{{ url_for('medicines.generic_search') }}" class="btn btn-sm btn-outline-secondary">Generic Search</a>
+    <a href="{{ url_for('medicines.create') }}" class="btn btn-sm btn-primary">
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16" class="me-1">
+        <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+      </svg>
+      Add Medicine
+    </a>
+  </div>
+</div>
+
+<!-- Filters -->
+<div class="card mb-3">
+  <div class="card-body py-2">
+    <form method="get" class="row g-2 align-items-end">
+      <div class="col-md-4">
+        <input type="text" name="q" value="{{ q }}" class="form-control form-control-sm"
+               placeholder="Search name, generic, barcode, code…"/>
+      </div>
+      <div class="col-md-2">
+        <select name="schedule" class="form-select form-select-sm">
+          <option value="">All Schedules</option>
+          {% for s in ['H','H1','X','G','OTC','P'] %}
+            <option value="{{ s }}" {% if schedule == s %}selected{% endif %}>Schedule {{ s }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-2">
+        <select name="category_id" class="form-select form-select-sm">
+          <option value="0">All Categories</option>
+          {% for cat in categories %}
+            <option value="{{ cat.id }}" {% if category_id == cat.id %}selected{% endif %}>{{ cat.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-2">
+        <select name="branch_id" class="form-select form-select-sm">
+          <option value="0">All Branches</option>
+          {% for br in branches %}
+            <option value="{{ br.id }}" {% if branch_id == br.id %}selected{% endif %}>{{ br.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-2 d-flex gap-1">
+        <button type="submit" class="btn btn-sm btn-primary">Filter</button>
+        <a href="{{ url_for('medicines.index') }}" class="btn btn-sm btn-outline-secondary">Clear</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Table -->
+<div class="card">
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0" id="medTable">
+        <thead class="table-light">
+          <tr>
+            <th>Code</th>
+            <th>Medicine Name</th>
+            <th>Generic Name</th>
+            <th>Schedule</th>
+            <th>Category</th>
+            <th class="text-end">MRP (Rs.)</th>
+            <th class="text-center">Stock Qty</th>
+            <th class="text-center">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for med in medicines %}
+          <tr>
+            <td><code>{{ med.medicine_code }}</code></td>
+            <td>
+              <a href="{{ url_for('medicines.detail', medicine_id=med.id) }}" class="fw-600 text-decoration-none">
+                {{ med.name }}
+              </a>
+              {% if med.prescription_req %}
+                <span class="badge bg-warning text-dark ms-1" style="font-size:.65rem;">Rx</span>
+              {% endif %}
+              {% if med.narcotic_flag %}
+                <span class="badge bg-danger ms-1" style="font-size:.65rem;">Narcotic</span>
+              {% endif %}
+            </td>
+            <td class="text-muted">{{ med.generic_name or '—' }}</td>
+            <td>
+              <span class="schedule-badge badge-{{ med.schedule_type }}">{{ med.schedule_type }}</span>
+            </td>
+            <td>{{ med.category.name if med.category else '—' }}</td>
+            <td class="text-end">{{ '%.2f'|format(med.mrp|float) }}</td>
+            <td class="text-center">
+              <span class="{{ 'stock-low' if med._stock_qty <= med.reorder_level else 'stock-ok' }}">
+                {{ med._stock_qty }}
+              </span>
+              {% if med._stock_qty <= med.reorder_level %}
+                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="#D32F2F" viewBox="0 0 16 16" title="Low stock">
+                  <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+                </svg>
+              {% endif %}
+            </td>
+            <td class="text-center">
+              <div class="btn-group btn-group-sm">
+                <a href="{{ url_for('medicines.detail', medicine_id=med.id) }}"
+                   class="btn btn-outline-secondary" title="View">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"/>
+                    <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/>
+                  </svg>
+                </a>
+                <a href="{{ url_for('medicines.edit', medicine_id=med.id) }}"
+                   class="btn btn-outline-primary" title="Edit">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
+                  </svg>
+                </a>
+                <form method="post" action="{{ url_for('medicines.delete', medicine_id=med.id) }}"
+                      style="display:inline"
+                      onsubmit="return confirm('Delete {{ med.name }}? This cannot be undone.')">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                  <button type="submit" class="btn btn-outline-danger" title="Delete">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="currentColor" viewBox="0 0 16 16">
+                      <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                      <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                    </svg>
+                  </button>
+                </form>
+              </div>
+            </td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="8" class="text-center py-4 text-muted">
+              No medicines found.
+              <a href="{{ url_for('medicines.create') }}">Add the first one</a>.
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <!-- Pagination -->
+  {% if pagination.pages > 1 %}
+  <div class="card-footer d-flex justify-content-between align-items-center">
+    <small class="text-muted">
+      Showing {{ pagination.first }} – {{ pagination.last }} of {{ pagination.total }} medicines
+    </small>
+    <nav>
+      <ul class="pagination pagination-sm mb-0">
+        <li class="page-item {% if not pagination.has_prev %}disabled{% endif %}">
+          <a class="page-link" href="{{ url_for('medicines.index', page=pagination.prev_num, q=q, schedule=schedule, category_id=category_id, branch_id=branch_id) }}">Prev</a>
+        </li>
+        {% for p in pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+          {% if p %}
+            <li class="page-item {% if p == pagination.page %}active{% endif %}">
+              <a class="page-link" href="{{ url_for('medicines.index', page=p, q=q, schedule=schedule, category_id=category_id, branch_id=branch_id) }}">{{ p }}</a>
+            </li>
+          {% else %}
+            <li class="page-item disabled"><span class="page-link">…</span></li>
+          {% endif %}
+        {% endfor %}
+        <li class="page-item {% if not pagination.has_next %}disabled{% endif %}">
+          <a class="page-link" href="{{ url_for('medicines.index', page=pagination.next_num, q=q, schedule=schedule, category_id=category_id, branch_id=branch_id) }}">Next</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

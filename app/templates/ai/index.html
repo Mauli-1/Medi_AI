@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<h5 class="mb-4 fw-bold">AI Insights</h5>
+
+<div class="row g-3">
+  <div class="col-md-4">
+    <div class="card h-100"><div class="card-body">
+      <h6 class="fw-bold">Smart Reorder</h6>
+      <p class="text-muted small">Suggested purchase quantities based on 90-day sales velocity.</p>
+      <a href="{{ url_for('ai.smart_reorder') }}" class="btn btn-sm btn-accent">Open</a>
+    </div></div>
+  </div>
+  <div class="col-md-4">
+    <div class="card h-100"><div class="card-body">
+      <h6 class="fw-bold">Sales Forecast</h6>
+      <p class="text-muted small">Moving-average revenue projection.</p>
+      <a href="{{ url_for('ai.sales_forecast') }}" class="btn btn-sm btn-accent">Open</a>
+    </div></div>
+  </div>
+  <div class="col-md-4">
+    <div class="card h-100"><div class="card-body">
+      <h6 class="fw-bold">Smart Assistant</h6>
+      <p class="text-muted small">Rule-based chatbot for quick stock/sales queries.</p>
+      <a href="{{ url_for('ai.chatbot') }}" class="btn btn-sm btn-accent">Open</a>
+    </div></div>
+  </div>
+</div>
+{% endblock %}

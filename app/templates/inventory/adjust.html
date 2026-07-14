@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+
+{% block title %}Stock Adjustment{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <h4 class="mb-0 fw-700">Stock Adjustment</h4>
+    <small class="text-muted">Correct inventory quantities with full audit trail</small>
+  </div>
+  <a href="{{ url_for('inventory.stock') }}" class="btn btn-sm btn-outline-secondary">Back to Stock</a>
+</div>
+
+<div class="row g-3">
+  <!-- Form -->
+  <div class="col-lg-6">
+    <div class="card">
+      <div class="card-header fw-600">New Adjustment</div>
+      <div class="card-body">
+        <form method="post" action="{{ url_for('inventory.adjust') }}" id="adjustForm" novalidate>
+          {{ form.hidden_tag() }}
+
+          <!-- Medicine -->
+          <div class="mb-3">
+            {{ form.medicine_id.label(class='form-label fw-600') }}
+            {{ form.medicine_id(class='form-select', id='medicineSelect',
+                                onchange='loadBatches(this.value)') }}
+            {% for err in form.medicine_id.errors %}
+              <div class="invalid-feedback d-block">{{ err }}</div>
+            {% endfor %}
+          </div>
+
+          <!-- Batch -->
+          <div class="mb-3">
+            {{ form.batch_id.label(class='form-label fw-600') }}
+            {{ form.batch_id(class='form-select', id='batchSelect') }}
+            {% for err in form.batch_id.errors %}
+              <div class="invalid-feedback d-block">{{ err }}</div>
+            {% endfor %}
+          </div>
+
+          <!-- Adjustment type -->
+          <div class="mb-3">
+            {{ form.adj_type.label(class='form-label fw-600') }}
+            {{ form.adj_type(class='form-select') }}
+          </div>
+
+          <!-- Quantity -->
+          <div class="mb-3">
+            {{ form.qty_change.label(class='form-label fw-600') }}
+            <div class="input-group">
+              <span class="input-group-text">±</span>
+              {{ form.qty_change(class='form-control', id='qtyChange',
+                                  placeholder='e.g. -5 or +10') }}
+            </div>
+            <div class="form-text text-muted">Use negative to reduce, positive to increase.</div>
+            {% for err in form.qty_change.errors %}
+              <div class="invalid-feedback d-block">{{ err }}</div>
+            {% endfor %}
+          </div>
+
+          <!-- Reason -->
+          <div class="mb-3">
+            {{ form.reason.label(class='form-label fw-600') }}
+            {{ form.reason(class='form-control', rows=3,
+                           placeholder='Describe the reason for this adjustment…') }}
+            {% for err in form.reason.errors %}
+              <div class="invalid-feedback d-block">{{ err }}</div>
+            {% endfor %}
+          </div>
+
+          {{ form.submit(class='btn btn-warning w-100 fw-600') }}
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent adjustments -->
+  <div class="col-lg-6">
+    <div class="card">
+      <div class="card-header fw-600">Recent Adjustments</div>
+      <div class="table-responsive">
+        <table class="table table-sm mb-0">
+          <thead class="table-light">
+            <tr>
+              <th>Adj. No.</th>
+              <th>Type</th>
+              <th>Branch</th>
+              <th>Status</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for adj in recent %}
+            <tr>
+              <td><code>{{ adj.adj_number }}</code></td>
+              <td>{{ adj.adj_type | replace('_', ' ') | title }}</td>
+              <td>{{ adj.branch.name if adj.branch else '—' }}</td>
+              <td>
+                <span class="badge {% if adj.status == 'approved' %}bg-success{% elif adj.status == 'rejected' %}bg-danger{% else %}bg-warning text-dark{% endif %}">
+                  {{ adj.status | title }}
+                </span>
+              </td>
+              <td class="small text-muted">{{ adj.created_at.strftime('%d %b %Y %H:%M') }}</td>
+            </tr>
+            {% else %}
+            <tr>
+              <td colspan="5" class="text-center text-muted py-3">No recent adjustments.</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function loadBatches(medicineId) {
+  const batchSelect = document.getElementById('batchSelect');
+  if (!medicineId || medicineId == 0) {
+    batchSelect.innerHTML = '<option value="0">-- Select Medicine First --</option>';
+    return;
+  }
+  // Re-submit the form to reload batch choices server-side
+  document.getElementById('adjustForm').submit();
+}
+</script>
+{% endblock %}

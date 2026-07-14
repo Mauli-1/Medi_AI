@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+{% block title %}Edit Supplier{% endblock %}
+{% block topbar_title %}Edit Supplier{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-3" style="max-width:900px;">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+      <h4 class="mb-0 fw-bold">Edit Supplier</h4>
+      <small class="text-muted">
+        <span class="badge bg-light text-dark border font-monospace">{{ supplier.supplier_code }}</span>
+        {{ supplier.name }}
+      </small>
+    </div>
+    <div class="d-flex gap-2">
+      <a href="{{ url_for('suppliers.ledger', supplier_id=supplier.id) }}" class="btn btn-outline-info btn-sm">Ledger</a>
+      <a href="{{ url_for('suppliers.index') }}" class="btn btn-outline-secondary btn-sm">Back to List</a>
+    </div>
+  </div>
+
+  <form method="POST" action="{{ url_for('suppliers.edit', supplier_id=supplier.id) }}" novalidate>
+    {{ form.hidden_tag() }}
+
+    <div class="row g-3">
+      <div class="col-md-8">
+        <div class="card border-0 shadow-sm mb-3">
+          <div class="card-header bg-white border-bottom fw-semibold">Basic Information</div>
+          <div class="card-body">
+            <div class="row g-3">
+              <div class="col-12">
+                <label class="form-label">{{ form.name.label.text }}</label>
+                {{ form.name(class='form-control' + (' is-invalid' if form.name.errors else '')) }}
+                {% for e in form.name.errors %}<div class="invalid-feedback">{{ e }}</div>{% endfor %}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">{{ form.contact_person.label.text }}</label>
+                {{ form.contact_person(class='form-control') }}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">{{ form.phone.label.text }}</label>
+                {{ form.phone(class='form-control') }}
+              </div>
+              <div class="col-12">
+                <label class="form-label">{{ form.email.label.text }}</label>
+                {{ form.email(class='form-control' + (' is-invalid' if form.email.errors else '')) }}
+                {% for e in form.email.errors %}<div class="invalid-feedback">{{ e }}</div>{% endfor %}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card border-0 shadow-sm mb-3">
+          <div class="card-header bg-white border-bottom fw-semibold">Address</div>
+          <div class="card-body">
+            <div class="row g-3">
+              <div class="col-12">
+                <label class="form-label">{{ form.address.label.text }}</label>
+                {{ form.address(class='form-control', rows=3) }}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">{{ form.city.label.text }}</label>
+                {{ form.city(class='form-control') }}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">{{ form.state.label.text }}</label>
+                {{ form.state(class='form-select') }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="card border-0 shadow-sm mb-3">
+          <div class="card-header bg-white border-bottom fw-semibold">Regulatory</div>
+          <div class="card-body">
+            <div class="mb-3">
+              <label class="form-label">{{ form.gst_number.label.text }}</label>
+              {{ form.gst_number(class='form-control font-monospace') }}
+            </div>
+            <div class="mb-0">
+              <label class="form-label">{{ form.drug_license_no.label.text }}</label>
+              {{ form.drug_license_no(class='form-control') }}
+            </div>
+          </div>
+        </div>
+
+        <div class="card border-0 shadow-sm mb-3">
+          <div class="card-header bg-white border-bottom fw-semibold">Financial Terms</div>
+          <div class="card-body">
+            <div class="mb-3">
+              <label class="form-label">{{ form.payment_terms.label.text }}</label>
+              {{ form.payment_terms(class='form-select') }}
+            </div>
+            <div class="mb-3">
+              <label class="form-label">{{ form.credit_limit.label.text }}</label>
+              <div class="input-group">
+                <span class="input-group-text">₹</span>
+                {{ form.credit_limit(class='form-control') }}
+              </div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label text-muted small">Outstanding</label>
+              <div class="fw-bold {% if supplier.outstanding | float > 0 %}text-danger{% else %}text-success{% endif %}">
+                ₹{{ '%.2f' % (supplier.outstanding | float) }}
+              </div>
+            </div>
+            <div class="form-check">
+              {{ form.is_active(class='form-check-input') }}
+              <label class="form-check-label">{{ form.is_active.label.text }}</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="d-grid gap-2">
+          {{ form.submit(class='btn btn-primary') }}
+          <a href="{{ url_for('suppliers.index') }}" class="btn btn-outline-secondary">Cancel</a>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+{% endblock %}

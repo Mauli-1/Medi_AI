@@ -1,0 +1,194 @@
+{% extends 'base.html' %}
+{% block title %}Suppliers{% endblock %}
+
+{% block topbar_title %}Suppliers{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-3">
+
+  <!-- Page header -->
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+      <h4 class="mb-0 fw-bold">Suppliers</h4>
+      <small class="text-muted">Manage your medicine suppliers and distributors</small>
+    </div>
+    <a href="{{ url_for('suppliers.create') }}" class="btn btn-primary">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" class="me-1">
+        <path d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2z"/>
+      </svg>
+      Add Supplier
+    </a>
+  </div>
+
+  <!-- Search -->
+  <div class="card border-0 shadow-sm mb-3">
+    <div class="card-body py-2">
+      <form method="GET" action="{{ url_for('suppliers.index') }}" class="d-flex gap-2">
+        <input type="text" name="q" value="{{ q }}" placeholder="Search by name, code, phone…"
+               class="form-control form-control-sm" style="max-width:350px;">
+        <button class="btn btn-sm btn-outline-primary" type="submit">Search</button>
+        {% if q %}<a href="{{ url_for('suppliers.index') }}" class="btn btn-sm btn-outline-secondary">Clear</a>{% endif %}
+      </form>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="card border-0 shadow-sm">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th>Code</th>
+              <th>Supplier Name</th>
+              <th>Contact</th>
+              <th>Phone</th>
+              <th>GST No.</th>
+              <th class="text-end">Outstanding</th>
+              <th class="text-center">Performance</th>
+              <th class="text-center">Status</th>
+              <th class="text-center">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for s in suppliers.items %}
+            <tr>
+              <td>
+                <span class="badge bg-light text-dark border font-monospace">{{ s.supplier_code }}</span>
+              </td>
+              <td>
+                <div class="fw-semibold">{{ s.name }}</div>
+                {% if s.city %}<small class="text-muted">{{ s.city }}{% if s.state %}, {{ s.state }}{% endif %}</small>{% endif %}
+              </td>
+              <td>
+                {% if s.contact_person %}
+                  <small>{{ s.contact_person }}</small>
+                {% else %}
+                  <span class="text-muted">—</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if s.phone %}
+                  <a href="tel:{{ s.phone }}" class="text-decoration-none">{{ s.phone }}</a>
+                {% else %}
+                  <span class="text-muted">—</span>
+                {% endif %}
+              </td>
+              <td>
+                <small class="font-monospace">{{ s.gst_number or '—' }}</small>
+              </td>
+              <td class="text-end">
+                {% set out = s.outstanding | float %}
+                {% if out > 0 %}
+                  <span class="fw-bold text-danger">₹{{ '%.2f' % out }}</span>
+                {% else %}
+                  <span class="text-success">₹0.00</span>
+                {% endif %}
+              </td>
+              <td class="text-center">
+                {% set score = s.performance_score | float %}
+                <span title="Score: {{ score }}/10">
+                  {% for i in range(1, 6) %}
+                    {% if score >= i * 2 %}
+                      <span class="text-warning">★</span>
+                    {% elif score >= i * 2 - 1 %}
+                      <span class="text-warning" style="opacity:.5;">★</span>
+                    {% else %}
+                      <span class="text-muted">☆</span>
+                    {% endif %}
+                  {% endfor %}
+                </span>
+              </td>
+              <td class="text-center">
+                {% if s.is_active %}
+                  <span class="badge bg-success-subtle text-success border border-success-subtle">Active</span>
+                {% else %}
+                  <span class="badge bg-secondary-subtle text-secondary border">Inactive</span>
+                {% endif %}
+              </td>
+              <td class="text-center">
+                <div class="d-flex gap-1 justify-content-center">
+                  <a href="{{ url_for('suppliers.ledger', supplier_id=s.id) }}"
+                     class="btn btn-sm btn-outline-info" title="Ledger">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+                      <path d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2zm2-1a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H4z"/>
+                      <path d="M9.5 8.5a.5.5 0 0 0-1 0v1H8a.5.5 0 0 0 0 1h.5v1a.5.5 0 0 0 1 0v-1H10a.5.5 0 0 0 0-1h-.5v-1z"/>
+                    </svg>
+                  </a>
+                  <a href="{{ url_for('suppliers.aging', supplier_id=s.id) }}"
+                     class="btn btn-sm btn-outline-warning" title="Aging Report">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+                      <path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"/>
+                      <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z"/>
+                    </svg>
+                  </a>
+                  <a href="{{ url_for('suppliers.edit', supplier_id=s.id) }}"
+                     class="btn btn-sm btn-outline-secondary" title="Edit">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+                      <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
+                    </svg>
+                  </a>
+                  <form method="POST" action="{{ url_for('suppliers.delete', supplier_id=s.id) }}"
+                        onsubmit="return confirm('Delete {{ s.name }}?')" class="d-inline">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                        <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                      </svg>
+                    </button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+            {% else %}
+            <tr>
+              <td colspan="9" class="text-center py-5 text-muted">
+                {% if q %}
+                  No suppliers match "{{ q }}".
+                {% else %}
+                  No suppliers yet. <a href="{{ url_for('suppliers.create') }}">Add your first supplier</a>.
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      {% if suppliers.pages > 1 %}
+      <div class="d-flex justify-content-between align-items-center px-3 py-2 border-top">
+        <small class="text-muted">
+          Showing {{ suppliers.items | length }} of {{ suppliers.total }} suppliers
+        </small>
+        <nav>
+          <ul class="pagination pagination-sm mb-0">
+            {% if suppliers.has_prev %}
+            <li class="page-item">
+              <a class="page-link" href="{{ url_for('suppliers.index', page=suppliers.prev_num, q=q) }}">Prev</a>
+            </li>
+            {% endif %}
+            {% for p in suppliers.iter_pages() %}
+              {% if p %}
+                <li class="page-item {{ 'active' if p == suppliers.page else '' }}">
+                  <a class="page-link" href="{{ url_for('suppliers.index', page=p, q=q) }}">{{ p }}</a>
+                </li>
+              {% else %}
+                <li class="page-item disabled"><span class="page-link">…</span></li>
+              {% endif %}
+            {% endfor %}
+            {% if suppliers.has_next %}
+            <li class="page-item">
+              <a class="page-link" href="{{ url_for('suppliers.index', page=suppliers.next_num, q=q) }}">Next</a>
+            </li>
+            {% endif %}
+          </ul>
+        </nav>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+</div>
+{% endblock %}

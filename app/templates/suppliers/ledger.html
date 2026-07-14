@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+{% block title %}Supplier Ledger – {{ supplier.name }}{% endblock %}
+{% block topbar_title %}Supplier Ledger{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-3">
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+      <h4 class="mb-0 fw-bold">Ledger – {{ supplier.name }}</h4>
+      <small class="text-muted">
+        <span class="badge bg-light text-dark border font-monospace">{{ supplier.supplier_code }}</span>
+        {% if supplier.phone %} &nbsp;|&nbsp; {{ supplier.phone }}{% endif %}
+        {% if supplier.gst_number %} &nbsp;|&nbsp; GSTIN: {{ supplier.gst_number }}{% endif %}
+      </small>
+    </div>
+    <div class="d-flex gap-2">
+      <a href="{{ url_for('suppliers.aging', supplier_id=supplier.id) }}" class="btn btn-outline-warning btn-sm">Aging Report</a>
+      <a href="{{ url_for('suppliers.edit', supplier_id=supplier.id) }}" class="btn btn-outline-secondary btn-sm">Edit</a>
+      <a href="{{ url_for('suppliers.index') }}" class="btn btn-outline-secondary btn-sm">Back</a>
+      <button onclick="window.print()" class="btn btn-outline-primary btn-sm">Print</button>
+    </div>
+  </div>
+
+  <!-- Summary cards -->
+  <div class="row g-3 mb-3">
+    <div class="col-md-3">
+      <div class="card border-0 shadow-sm text-center py-3">
+        <div class="text-muted small">Total Purchases</div>
+        <div class="fw-bold fs-5">
+          ₹{{ '%.2f' % (entries | sum(attribute='debit') if entries else 0) }}
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card border-0 shadow-sm text-center py-3">
+        <div class="text-muted small">Total Paid</div>
+        <div class="fw-bold fs-5 text-success">
+          ₹{{ '%.2f' % (entries | sum(attribute='credit') if entries else 0) }}
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card border-0 shadow-sm text-center py-3">
+        <div class="text-muted small">Outstanding</div>
+        <div class="fw-bold fs-5 {% if supplier.outstanding | float > 0 %}text-danger{% else %}text-success{% endif %}">
+          ₹{{ '%.2f' % (supplier.outstanding | float) }}
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card border-0 shadow-sm text-center py-3">
+        <div class="text-muted small">Credit Limit</div>
+        <div class="fw-bold fs-5">₹{{ '%.2f' % (supplier.credit_limit | float) }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ledger table -->
+  <div class="card border-0 shadow-sm">
+    <div class="card-header bg-white border-bottom fw-semibold">Account Statement</div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th>Date</th>
+              <th>Voucher Type</th>
+              <th>Reference</th>
+              <th>Invoice No.</th>
+              <th class="text-end">Debit (Purchase)</th>
+              <th class="text-end">Credit (Payment)</th>
+              <th class="text-end">Balance</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for e in entries %}
+            <tr>
+              <td>{{ e.date.strftime('%d-%m-%Y') if e.date else '—' }}</td>
+              <td><span class="badge bg-info-subtle text-info border border-info-subtle">{{ e.voucher_type }}</span></td>
+              <td>
+                <a href="{{ url_for('purchase.index') }}?q={{ e.reference }}" class="text-decoration-none font-monospace">
+                  {{ e.reference }}
+                </a>
+              </td>
+              <td><small class="text-muted">{{ e.invoice or '—' }}</small></td>
+              <td class="text-end text-danger">₹{{ '%.2f' % e.debit }}</td>
+              <td class="text-end text-success">{{ ('₹%.2f' % e.credit) if e.credit > 0 else '—' }}</td>
+              <td class="text-end fw-semibold">₹{{ '%.2f' % e.balance }}</td>
+            </tr>
+            {% else %}
+            <tr>
+              <td colspan="7" class="text-center py-5 text-muted">No transactions found.</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+          {% if entries %}
+          <tfoot class="table-light fw-bold">
+            <tr>
+              <td colspan="4">Total</td>
+              <td class="text-end text-danger">₹{{ '%.2f' % (entries | sum(attribute='debit')) }}</td>
+              <td class="text-end text-success">₹{{ '%.2f' % (entries | sum(attribute='credit')) }}</td>
+              <td class="text-end">₹{{ '%.2f' % (supplier.outstanding | float) }}</td>
+            </tr>
+          </tfoot>
+          {% endif %}
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

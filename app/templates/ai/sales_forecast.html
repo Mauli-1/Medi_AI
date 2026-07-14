@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h5 class="mb-0 fw-bold">Sales Forecast</h5>
+  <a href="{{ url_for('ai.index') }}" class="btn btn-sm btn-outline-secondary">← Back</a>
+</div>
+
+<form method="get" class="d-flex gap-2 mb-3">
+  <input type="number" name="days" value="{{ days }}" class="form-control form-control-sm" style="max-width:120px">
+  <button class="btn btn-sm btn-outline-secondary">Recalculate</button>
+</form>
+
+<div class="row g-3">
+  <div class="col-md-6">
+    <div class="card h-100"><div class="card-body">
+      <div class="text-muted small">Avg Daily Revenue (last 90 days)</div>
+      <div class="fs-4 fw-bold">₹{{ '{:,.2f}'.format(forecast.avg_daily_revenue) }}</div>
+    </div></div>
+  </div>
+  <div class="col-md-6">
+    <div class="card h-100"><div class="card-body">
+      <div class="text-muted small">Predicted Revenue (next {{ forecast.days_ahead }} days)</div>
+      <div class="fs-4 fw-bold" style="color:var(--accent)">₹{{ '{:,.2f}'.format(forecast.predicted_revenue) }}</div>
+    </div></div>
+  </div>
+</div>
+<p class="text-muted small mt-3">Simple moving-average forecast based on the trailing 90-day sales trend. Not a machine-learning model.</p>
+{% endblock %}

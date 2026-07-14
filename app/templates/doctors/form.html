@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h5 class="mb-0 fw-bold">{{ title }}</h5>
+  <a href="{{ url_for('doctors.index') }}" class="btn btn-sm btn-outline-secondary">← Back</a>
+</div>
+<form method="post">
+  <div class="card mb-3">
+    <div class="card-body row g-3">
+      <div class="col-md-6">
+        <label class="form-label small">Full Name *</label>
+        <input type="text" name="full_name" class="form-control form-control-sm" value="{{ doctor.full_name if doctor else '' }}" required>
+      </div>
+      <div class="col-md-3">
+        <label class="form-label small">Specialization</label>
+        <input type="text" name="specialization" class="form-control form-control-sm" value="{{ doctor.specialization if doctor else '' }}">
+      </div>
+      <div class="col-md-3">
+        <label class="form-label small">Qualification</label>
+        <input type="text" name="qualification" class="form-control form-control-sm" value="{{ doctor.qualification if doctor else '' }}">
+      </div>
+      <div class="col-md-4">
+        <label class="form-label small">Registration No.</label>
+        <input type="text" name="registration_no" class="form-control form-control-sm" value="{{ doctor.registration_no if doctor else '' }}">
+      </div>
+      <div class="col-md-4">
+        <label class="form-label small">Phone</label>
+        <input type="text" name="phone" class="form-control form-control-sm" value="{{ doctor.phone if doctor else '' }}">
+      </div>
+      <div class="col-md-4">
+        <label class="form-label small">Email</label>
+        <input type="email" name="email" class="form-control form-control-sm" value="{{ doctor.email if doctor else '' }}">
+      </div>
+      <div class="col-md-6">
+        <label class="form-label small">Clinic/Hospital Name</label>
+        <input type="text" name="clinic_name" class="form-control form-control-sm" value="{{ doctor.clinic_name if doctor else '' }}">
+      </div>
+      <div class="col-md-6">
+        <label class="form-label small">Clinic Address</label>
+        <input type="text" name="clinic_address" class="form-control form-control-sm" value="{{ doctor.clinic_address if doctor else '' }}">
+      </div>
+      {% if doctor %}
+      <div class="col-12">
+        <div class="form-check">
+          <input type="checkbox" name="is_active" class="form-check-input" id="isActive" {% if doctor.is_active %}checked{% endif %}>
+          <label class="form-check-label small" for="isActive">Active</label>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+  <button class="btn btn-accent">{{ 'Save Changes' if doctor else 'Add Doctor' }}</button>
+</form>
+{% endblock %}

@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h5 class="mb-0 fw-bold">Smart Reorder Suggestions</h5>
+  <a href="{{ url_for('ai.index') }}" class="btn btn-sm btn-outline-secondary">← Back</a>
+</div>
+<div class="card">
+  <div class="table-responsive">
+    <table class="table table-sm table-hover mb-0">
+      <thead class="table-light"><tr><th>Medicine</th><th class="text-end">Current Stock</th><th class="text-end">Avg Daily Sales</th>
+        <th class="text-end">Days of Stock Left</th><th class="text-end">Suggested Order Qty</th></tr></thead>
+      <tbody>
+        {% for s in suggestions %}
+        <tr>
+          <td class="fw-semibold">{{ s.medicine_name }}</td>
+          <td class="text-end">{{ s.current_stock }}</td>
+          <td class="text-end">{{ s.avg_daily_sales }}</td>
+          <td class="text-end {% if s.days_of_stock_left < 7 %}text-danger{% endif %}">{{ s.days_of_stock_left }}</td>
+          <td class="text-end fw-semibold">{{ s.suggested_order_qty }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5" class="text-center text-muted py-4">No reorder suggestions — stock levels look healthy.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

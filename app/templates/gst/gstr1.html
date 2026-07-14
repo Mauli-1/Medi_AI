@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h5 class="mb-0 fw-bold">GSTR-1 — Outward Supplies</h5>
+    <p class="text-muted mb-0 small">Period {{ period }}</p>
+  </div>
+  <div class="d-flex gap-2">
+    <a href="{{ url_for('gst.index') }}" class="btn btn-sm btn-outline-secondary">← Back</a>
+    <a href="{{ url_for('gst.export_gstr1', period=period) }}" class="btn btn-sm btn-accent">Export Excel</a>
+  </div>
+</div>
+<div class="card">
+  <div class="table-responsive">
+    <table class="table table-sm table-hover mb-0">
+      <thead class="table-light">
+        <tr><th>Invoice No</th><th>Date</th><th>Customer GSTIN</th><th class="text-end">Taxable</th>
+          <th class="text-end">CGST</th><th class="text-end">SGST</th><th class="text-end">IGST</th><th class="text-end">Total</th></tr>
+      </thead>
+      <tbody>
+        {% for r in rows %}
+        <tr>
+          <td class="fw-semibold">{{ r.invoice_number }}</td>
+          <td class="small">{{ r.invoice_date.strftime('%d-%m-%Y') if r.invoice_date else '—' }}</td>
+          <td class="small">{{ r.customer_gstin or '—' }}</td>
+          <td class="text-end">₹{{ '{:,.2f}'.format(r.subtotal) }}</td>
+          <td class="text-end">₹{{ '{:,.2f}'.format(r.cgst_amount) }}</td>
+          <td class="text-end">₹{{ '{:,.2f}'.format(r.sgst_amount) }}</td>
+          <td class="text-end">₹{{ '{:,.2f}'.format(r.igst_amount) }}</td>
+          <td class="text-end fw-semibold">₹{{ '{:,.2f}'.format(r.total_amount) }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="8" class="text-center text-muted py-4">No confirmed sales in this period.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h5 class="mb-0 fw-bold">Branches</h5>
+  <a href="{{ url_for('branches.create') }}" class="btn btn-sm btn-accent">+ Add Branch</a>
+</div>
+
+<div class="row g-3">
+  {% for b in branches %}
+  <div class="col-md-4">
+    <div class="card h-100">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start">
+          <h6 class="fw-bold mb-1">{{ b.name }} {% if b.is_headquarters %}<span class="badge bg-accent" style="background:var(--accent)">HQ</span>{% endif %}</h6>
+        </div>
+        <p class="text-muted small mb-2">{{ b.code }} · {{ b.city or '' }}</p>
+        <p class="small mb-1">Manager: {{ b.manager_name or '—' }}</p>
+        <p class="small mb-3">{{ b.phone or '' }}</p>
+        <a href="{{ url_for('branches.detail', branch_id=b.id) }}" class="btn btn-sm btn-outline-primary">View</a>
+        <a href="{{ url_for('branches.edit', branch_id=b.id) }}" class="btn btn-sm btn-outline-secondary">Edit</a>
+      </div>
+    </div>
+  </div>
+  {% else %}
+  <div class="col-12"><div class="card"><div class="card-body text-center text-muted py-4">No branches found.</div></div></div>
+  {% endfor %}
+</div>
+{% endblock %}

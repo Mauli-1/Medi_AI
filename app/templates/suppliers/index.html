@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">{{ title }}</h1>
+    <p class="page-subtitle">Manage supplier profiles and credit terms</p>
+  </div>
+</div>
+<div class="card">
+  <div class="card-body text-center py-5">
+    <div style="width:64px;height:64px;border-radius:16px;background:var(--accent-lt);
+                display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="var(--accent)" viewBox="0 0 16 16">
+        <path d="M14.5 3a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h13z"/>
+      </svg>
+    </div>
+    <h5 style="font-weight:600;color:var(--text);">{{ title }}</h5>
+    <p class="text-muted" style="max-width:320px;margin:0 auto;">Manage supplier profiles and credit terms.</p>
+    <p class="text-muted mt-2" style="font-size:.8125rem;">This module is under development.</p>
+  </div>
+</div>
+{% endblock %}

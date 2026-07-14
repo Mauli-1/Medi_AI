@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h5 class="mb-0 fw-bold">{{ title }}</h5>
+  <a href="{{ url_for('patients.index') }}" class="btn btn-sm btn-outline-secondary">← Back</a>
+</div>
+
+<form method="post">
+  <div class="card mb-3">
+    <div class="card-body row g-3">
+      <div class="col-md-6">
+        <label class="form-label small">Full Name *</label>
+        <input type="text" name="full_name" class="form-control form-control-sm" value="{{ patient.full_name if patient else '' }}" required>
+      </div>
+      <div class="col-md-3">
+        <label class="form-label small">Phone</label>
+        <input type="text" name="phone" class="form-control form-control-sm" value="{{ patient.phone if patient else '' }}">
+      </div>
+      <div class="col-md-3">
+        <label class="form-label small">Email</label>
+        <input type="email" name="email" class="form-control form-control-sm" value="{{ patient.email if patient else '' }}">
+      </div>
+      <div class="col-md-3">
+        <label class="form-label small">Date of Birth</label>
+        <input type="date" name="dob" class="form-control form-control-sm" value="{{ patient.dob.isoformat() if patient and patient.dob else '' }}">
+      </div>
+      <div class="col-md-3">
+        <label class="form-label small">Gender</label>
+        <select name="gender" class="form-select form-select-sm">
+          <option value="">-- Select --</option>
+          {% for g in ['male','female','other'] %}
+          <option value="{{ g }}" {% if patient and patient.gender==g %}selected{% endif %}>{{ g|capitalize }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-3">
+        <label class="form-label small">Blood Group</label>
+        <select name="blood_group" class="form-select form-select-sm">
+          <option value="">-- Select --</option>
+          {% for bg in ['A+','A-','B+','B-','O+','O-','AB+','AB-'] %}
+          <option value="{{ bg }}" {% if patient and patient.blood_group==bg %}selected{% endif %}>{{ bg }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-3">
+        <label class="form-label small">ABHA ID</label>
+        <input type="text" name="abha_id" class="form-control form-control-sm" value="{{ patient.abha_id if patient else '' }}" placeholder="14-digit ABHA ID">
+      </div>
+      <div class="col-12">
+        <label class="form-label small">Address</label>
+        <textarea name="address" class="form-control form-control-sm" rows="2">{{ patient.address if patient else '' }}</textarea>
+      </div>
+      <div class="col-md-6">
+        <label class="form-label small">Allergies</label>
+        <textarea name="allergies" class="form-control form-control-sm" rows="2">{{ patient.allergies if patient else '' }}</textarea>
+      </div>
+      <div class="col-md-6">
+        <label class="form-label small">Chronic Conditions</label>
+        <textarea name="chronic_conditions" class="form-control form-control-sm" rows="2">{{ patient.chronic_conditions if patient else '' }}</textarea>
+      </div>
+      {% if patient %}
+      <div class="col-12">
+        <div class="form-check">
+          <input type="checkbox" name="is_active" class="form-check-input" id="isActive" {% if patient.is_active %}checked{% endif %}>
+          <label class="form-check-label small" for="isActive">Active</label>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+  <button class="btn btn-accent">{{ 'Save Changes' if patient else 'Add Patient' }}</button>
+</form>
+{% endblock %}

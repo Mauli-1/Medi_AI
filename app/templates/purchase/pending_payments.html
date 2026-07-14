@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Pending Payments{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h5 class="mb-0 fw-bold">Pending Supplier Payments</h5>
+  <a href="{{ url_for('purchase.index') }}" class="btn btn-sm btn-outline-secondary">← Back</a>
+</div>
+<div class="card">
+  <div class="table-responsive">
+    <table class="table table-sm table-hover mb-0">
+      <thead class="table-light">
+        <tr><th>Bill No</th><th>Date</th><th>Supplier</th><th class="text-end">Total</th><th class="text-end">Paid</th><th class="text-end">Due</th><th>Status</th><th></th></tr>
+      </thead>
+      <tbody>
+        {% for p in purchases %}
+        <tr>
+          <td class="fw-semibold">{{ p.bill_number }}</td>
+          <td class="small">{{ p.bill_date.strftime('%d-%m-%Y') if p.bill_date else '—' }}</td>
+          <td class="small">{{ p.supplier.name if p.supplier else '—' }}</td>
+          <td class="text-end">₹{{ '{:,.2f}'.format(p.total_amount) }}</td>
+          <td class="text-end text-success">₹{{ '{:,.2f}'.format(p.paid_amount) }}</td>
+          <td class="text-end text-danger fw-bold">₹{{ '{:,.2f}'.format(p.due_amount) }}</td>
+          <td><span class="badge {% if p.payment_status=='partial' %}bg-warning text-dark{% else %}bg-danger{% endif %}">{{ p.payment_status|capitalize }}</span></td>
+          <td><a href="{{ url_for('purchase.detail', purchase_id=p.id) }}" class="btn btn-sm btn-outline-primary py-0 px-2">Pay</a></td>
+        </tr>
+        {% else %}
+        <tr><td colspan="8" class="text-center text-muted py-5">No pending payments.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

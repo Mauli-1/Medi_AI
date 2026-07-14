@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% block title %}New Purchase Order{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h5 class="mb-0 fw-bold">New Purchase Order</h5>
+  <a href="{{ url_for('purchase.orders_list') }}" class="btn btn-sm btn-outline-secondary">← Back</a>
+</div>
+
+<form method="POST">
+  {{ form.hidden_tag() }}
+  <input type="hidden" name="items_json" id="items_json" value="[]">
+
+  <div class="row g-3 mb-4">
+    <div class="col-md-4">
+      <label class="form-label small fw-semibold">Supplier *</label>
+      {{ form.supplier_id(class="form-select form-select-sm") }}
+    </div>
+    <div class="col-md-3">
+      <label class="form-label small fw-semibold">Order Date *</label>
+      {{ form.order_date(class="form-control form-control-sm", type="date") }}
+    </div>
+    <div class="col-md-3">
+      <label class="form-label small fw-semibold">Expected Date</label>
+      {{ form.expected_date(class="form-control form-control-sm", type="date") }}
+    </div>
+    <div class="col-md-2">
+      <label class="form-label small fw-semibold">Status</label>
+      {{ form.status(class="form-select form-select-sm") }}
+    </div>
+    <div class="col-12">
+      <label class="form-label small fw-semibold">Notes</label>
+      {{ form.notes(class="form-control form-control-sm", rows=2) }}
+    </div>
+  </div>
+
+  <div class="card mb-3">
+    <div class="card-header"><h6 class="mb-0">Items to Order</h6></div>
+    <div class="card-body border-bottom">
+      <div class="row g-2">
+        <div class="col-md-5">
+          <input type="text" id="medSearch" class="form-control form-control-sm" placeholder="Search medicine to add...">
+          <div id="medDropdown" class="list-group position-absolute" style="z-index:1000;display:none;max-width:400px"></div>
+        </div>
+      </div>
+    </div>
+    <div class="table-responsive">
+      <table class="table table-sm mb-0">
+        <thead class="table-light">
+          <tr><th>Medicine</th><th>Quantity</th><th>Rate</th><th class="text-end">Amount</th><th></th></tr>
+        </thead>
+        <tbody id="itemsBody">
+          <tr><td colspan="5" class="text-center text-muted py-3">Add medicines above</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <button type="submit" class="btn btn-accent">Create PO</button>
+</form>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let items = [];
+
+document.getElementById('medSearch').addEventListener('input', function() {
+  const q = this.value.trim();
+  if (q.length < 2) { document.getElementById('medDropdown').style.display='none'; return; }
+  fetch(`/medicines/api/search?q=${encodeURIComponent(q)}`)
+    .then(r => r.json()).then(data => {
+      const dd = document.getElementById('medDropdown');
+      dd.innerHTML = data.slice(0,10).map(m =>
+        `<a href="#" class="list-group-item list-group-item-action py-1 small" onclick="addItem(${JSON.stringify(m).replace(/"/g,'&quot;')});return false;">
+          <strong>${m.name}</strong> <span class="text-muted">${m.generic_name||''}</span></a>`
+      ).join('');
+      dd.style.display = data.length ? 'block' : 'none';
+    });
+});
+document.addEventListener('click', e => { if (!e.target.closest('#medSearch')) document.getElementById('medDropdown').style.display='none'; });
+
+function addItem(med) {
+  document.getElementById('medSearch').value = '';
+  document.getElementById('medDropdown').style.display='none';
+  items.push({ medicine_id: med.id, medicine_name: med.name, quantity: 1, rate: med.purchase_rate || 0 });
+  renderItems();
+}
+
+function removeItem(i) { items.splice(i,1); renderItems(); }
+
+function renderItems() {
+  const tbody = document.getElementById('itemsBody');
+  if (!items.length) { tbody.innerHTML='<tr><td colspan="5" class="text-center text-muted py-3">Add medicines above</td></tr>'; syncJson(); return; }
+  tbody.innerHTML = items.map((it,i) => `
+    <tr>
+      <td class="fw-semibold small">${it.medicine_name}</td>
+      <td><input type="number" class="form-control form-control-sm" style="width:80px" value="${it.quantity}" min="1" oninput="items[${i}].quantity=+this.value;renderItems()"></td>
+      <td><input type="number" class="form-control form-control-sm" style="width:90px" value="${it.rate}" min="0" step="0.01" oninput="items[${i}].rate=+this.value;renderItems()"></td>
+      <td class="text-end small">₹${(it.quantity * it.rate).toFixed(2)}</td>
+      <td><button type="button" class="btn btn-sm btn-outline-danger py-0 px-1" onclick="removeItem(${i})">✕</button></td>
+    </tr>`).join('');
+  syncJson();
+}
+
+function syncJson() {
+  document.getElementById('items_json').value = JSON.stringify(items);
+}
+</script>
+{% endblock %}

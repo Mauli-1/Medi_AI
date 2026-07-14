@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h5 class="mb-0 fw-bold">Upload Prescription</h5>
+  <a href="{{ url_for('prescriptions.index') }}" class="btn btn-sm btn-outline-secondary">← Back</a>
+</div>
+
+<div class="card" style="max-width:560px">
+  <div class="card-body">
+    <form method="post" enctype="multipart/form-data">
+      <label class="form-label small fw-semibold">Patient *</label>
+      <select name="patient_id" class="form-select mb-3" required>
+        <option value="">Select patient...</option>
+        {% for p in patients %}<option value="{{ p.id }}">{{ p.full_name }} — {{ p.phone or '' }}</option>{% endfor %}
+      </select>
+
+      <label class="form-label small fw-semibold">Doctor</label>
+      <select name="doctor_id" class="form-select mb-3">
+        <option value="">Select doctor (optional)...</option>
+        {% for d in doctors %}<option value="{{ d.id }}">Dr. {{ d.full_name }} — {{ d.specialization or '' }}</option>{% endfor %}
+      </select>
+
+      <label class="form-label small fw-semibold">Upload File (JPG/PNG/PDF)</label>
+      <input type="file" name="file" class="form-control mb-3" accept=".jpg,.jpeg,.png,.pdf">
+
+      <label class="form-label small fw-semibold">Notes</label>
+      <textarea name="notes" class="form-control mb-3" rows="3"></textarea>
+
+      <button class="btn btn-accent">Upload</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

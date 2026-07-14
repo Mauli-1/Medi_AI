@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+{% from 'medicines/_form_sections.html' import render_field %}
+
+{% block title %}Edit — {{ medicine.name }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <h4 class="mb-0 fw-700">Edit Medicine</h4>
+    <small class="text-muted">
+      <a href="{{ url_for('medicines.index') }}" class="text-decoration-none">Medicine Master</a>
+      /
+      <a href="{{ url_for('medicines.detail', medicine_id=medicine.id) }}" class="text-decoration-none">{{ medicine.name }}</a>
+      / Edit
+    </small>
+  </div>
+  <span class="badge bg-secondary">{{ medicine.medicine_code }}</span>
+</div>
+
+<form method="post" action="{{ url_for('medicines.edit', medicine_id=medicine.id) }}" novalidate>
+  {{ form.hidden_tag() }}
+  <div class="row g-3">
+
+    <div class="col-lg-8">
+      <div class="card mb-3">
+        <div class="card-header fw-600">Basic Information</div>
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-6">{{ render_field(form.name) }}</div>
+            <div class="col-md-6">{{ render_field(form.generic_name) }}</div>
+            <div class="col-md-6">{{ render_field(form.brand_name) }}</div>
+            <div class="col-12">{{ render_field(form.salt_composition) }}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card mb-3">
+        <div class="card-header fw-600">Classification</div>
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-6">{{ render_field(form.category_id) }}</div>
+            <div class="col-md-6">{{ render_field(form.manufacturer) }}</div>
+            <div class="col-md-4">{{ render_field(form.hsn_code) }}</div>
+            <div class="col-md-4">{{ render_field(form.schedule_type) }}</div>
+            <div class="col-md-4">{{ render_field(form.gst_rate) }}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card mb-3">
+        <div class="card-header fw-600">Pricing</div>
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-4">{{ render_field(form.mrp) }}</div>
+            <div class="col-md-4">{{ render_field(form.purchase_rate) }}</div>
+            <div class="col-md-4">{{ render_field(form.selling_rate) }}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card mb-3">
+        <div class="card-header fw-600">Storage &amp; Location</div>
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-4">{{ render_field(form.storage_condition) }}</div>
+            <div class="col-md-4">{{ render_field(form.rack_location) }}</div>
+            <div class="col-md-4">{{ render_field(form.barcode) }}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card mb-3">
+        <div class="card-header fw-600">Inventory Settings</div>
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-3">{{ render_field(form.unit) }}</div>
+            <div class="col-md-3">{{ render_field(form.pack_size) }}</div>
+            <div class="col-md-3">{{ render_field(form.reorder_level) }}</div>
+            <div class="col-md-3">{{ render_field(form.max_stock_level) }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-4">
+      <div class="card mb-3">
+        <div class="card-header fw-600">Flags &amp; Controls</div>
+        <div class="card-body">
+          <div class="list-group list-group-flush">
+            <label class="list-group-item d-flex justify-content-between align-items-center py-2 px-0">
+              Prescription Required
+              {{ form.prescription_req(class='form-check-input') }}
+            </label>
+            <label class="list-group-item d-flex justify-content-between align-items-center py-2 px-0">
+              Temperature Sensitive
+              {{ form.temp_sensitive(class='form-check-input') }}
+            </label>
+            <label class="list-group-item d-flex justify-content-between align-items-center py-2 px-0">
+              Narcotic / Controlled
+              {{ form.narcotic_flag(class='form-check-input') }}
+            </label>
+            <label class="list-group-item d-flex justify-content-between align-items-center py-2 px-0">
+              Returnable
+              {{ form.returnable_flag(class='form-check-input') }}
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="card mb-3">
+        <div class="card-header fw-600 text-muted small">Record Info</div>
+        <div class="card-body small text-muted">
+          <div>Created: {{ medicine.created_at.strftime('%d %b %Y') }}</div>
+          <div>Updated: {{ medicine.updated_at.strftime('%d %b %Y %H:%M') }}</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-body">
+          {{ form.submit(class='btn btn-primary w-100') }}
+          <a href="{{ url_for('medicines.detail', medicine_id=medicine.id) }}"
+             class="btn btn-outline-secondary w-100 mt-2">Cancel</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
+{% endblock %}

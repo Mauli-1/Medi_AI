@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h5 class="mb-0 fw-bold">Customer Loyalty</h5>
+  <a href="{{ url_for('loyalty.settings') }}" class="btn btn-sm btn-outline-secondary">Program Settings</a>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-3">
+    <div class="card h-100"><div class="card-body">
+      <div class="text-muted small">Points per ₹</div>
+      <div class="fs-5 fw-bold">{{ program.points_per_rupee }}</div>
+    </div></div>
+  </div>
+  <div class="col-md-3">
+    <div class="card h-100"><div class="card-body">
+      <div class="text-muted small">Gold Tier from</div>
+      <div class="fs-5 fw-bold">₹{{ '{:,.0f}'.format(program.gold_min_spend) }}</div>
+    </div></div>
+  </div>
+  <div class="col-md-3">
+    <div class="card h-100"><div class="card-body">
+      <div class="text-muted small">Platinum Tier from</div>
+      <div class="fs-5 fw-bold">₹{{ '{:,.0f}'.format(program.platinum_min_spend) }}</div>
+    </div></div>
+  </div>
+  <div class="col-md-3">
+    <div class="card h-100"><div class="card-body">
+      <div class="text-muted small">Referral Bonus</div>
+      <div class="fs-5 fw-bold">{{ program.referral_bonus_points }} pts</div>
+    </div></div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-body">
+    <h6 class="fw-bold mb-3">Top Patients by Loyalty Points</h6>
+    <table class="table table-sm table-hover mb-0">
+      <thead class="table-light"><tr><th>Patient</th><th>Tier</th><th class="text-end">Points</th><th class="text-end">Total Purchases</th><th></th></tr></thead>
+      <tbody>
+        {% for p in top_patients %}
+        <tr>
+          <td>{{ p.full_name }}</td>
+          <td><span class="badge {% if p.loyalty_tier=='platinum' %}bg-dark{% elif p.loyalty_tier=='gold' %}bg-warning text-dark{% else %}bg-secondary{% endif %}">{{ (p.loyalty_tier or 'silver')|capitalize }}</span></td>
+          <td class="text-end">{{ p.loyalty_points or 0 }}</td>
+          <td class="text-end">₹{{ '{:,.2f}'.format(p.total_purchases or 0) }}</td>
+          <td><a href="{{ url_for('loyalty.patient_history', patient_id=p.id) }}" class="btn btn-sm btn-outline-primary py-0 px-2">History</a></td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5" class="text-center text-muted py-4">No patients yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

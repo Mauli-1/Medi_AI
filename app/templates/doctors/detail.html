@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h5 class="mb-0 fw-bold">{{ doctor.full_name }} <span class="badge bg-light text-dark border">{{ doctor.doctor_code }}</span></h5>
+    <p class="text-muted mb-0 small">{{ doctor.specialization or '' }} · {{ doctor.clinic_name or '' }}</p>
+  </div>
+  <div class="d-flex gap-2">
+    <a href="{{ url_for('doctors.edit', doctor_id=doctor.id) }}" class="btn btn-sm btn-outline-primary">Edit</a>
+    <a href="{{ url_for('doctors.index') }}" class="btn btn-sm btn-outline-secondary">← Back</a>
+  </div>
+</div>
+
+<div class="card mb-3">
+  <div class="card-body">
+    <h6 class="fw-bold mb-3">Prescription History</h6>
+    <table class="table table-sm mb-0">
+      <thead class="table-light"><tr><th>Code</th><th>Patient</th><th>Date</th><th>Status</th></tr></thead>
+      <tbody>
+        {% for rx in prescriptions %}
+        <tr>
+          <td>{{ rx.prescription_code }}</td>
+          <td>{{ rx.patient.full_name if rx.patient else '—' }}</td>
+          <td class="small">{{ rx.rx_date.strftime('%d-%m-%Y') if rx.rx_date else '' }}</td>
+          <td><span class="badge bg-light text-dark border">{{ rx.status|capitalize }}</span></td>
+        </tr>
+        {% else %}
+        <tr><td colspan="4" class="text-center text-muted py-3">No prescriptions from this doctor yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

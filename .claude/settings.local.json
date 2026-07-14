@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(deactivate)",
+      "Bash(find / -maxdepth 6 -iname \"activate\" -path \"*medical*\")",
+      "Bash(find / -maxdepth 6 -iname \"activate\" -path \"*msms*\")",
+      "Bash(export FLASK_APP=wsgi.py FLASK_ENV=development)",
+      "Bash(python3.10 -m flask db migrate -m \"add loyalty tiers, sale override audit, whatsapp/ai logs, role hierarchy update\")",
+      "Bash(python3.10 -m flask db upgrade)",
+      "Bash(mysql -u root -proot msms_dev -e \"SHOW TABLES LIKE '%log%'; DESCRIBE patients;\")",
+      "Bash(python3.10 -c ' *)",
+      "Bash(python3.10 /tmp/claude-1000/-home-password-Medical-Store-Management-System/d49784ec-5e61-4471-bc1c-8dbc6e57a22b/scratchpad/smoke_test.py /whatsapp/ /whatsapp/logs /loyalty/ /loyalty/settings)",
+      "Bash(head -15 app/templates/medicines/list.html)",
+      "Bash(head -15 app/templates/medicines/index.html)",
+      "Bash(python3.10 /tmp/claude-1000/-home-password-Medical-Store-Management-System/d49784ec-5e61-4471-bc1c-8dbc6e57a22b/scratchpad/smoke_test.py /medicines/generic-search /medicines/generic-search?q=Paracetamol /medicines/)",
+      "Bash(python3.10 /tmp/claude-1000/-home-password-Medical-Store-Management-System/d49784ec-5e61-4471-bc1c-8dbc6e57a22b/scratchpad/smoke_test.py /reports/ /reports/view/daily-sales /reports/view/monthly-sales /reports/view/medicine-wise-sales /reports/view/customer-wise-sales /reports/view/cashier-wise-sales /reports/view/tax-wise-sales /reports/view/purchase-register /reports/view/supplier-wise-purchase /reports/view/product-wise-purchase /reports/view/purchase-audit /reports/view/stock-summary /reports/view/expiry-near /reports/view/batch-wise-stock /reports/view/rack-wise-stock /reports/view/overstock /reports/view/understock /reports/view/pl-statement /reports/view/schedule-h-register /reports/view/narcotic-register /reports/view/top-prescribing-doctors)",
+      "Bash(python3.10 /tmp/claude-1000/-home-password-Medical-Store-Management-System/d49784ec-5e61-4471-bc1c-8dbc6e57a22b/scratchpad/smoke_test.py /reports/view/schedule-h-register /reports/view/narcotic-register /reports/view/top-prescribing-doctors /reports/export/medicine-wise-sales.xlsx /reports/export/stock-summary.xlsx)",
+      "Bash(python3.10 /tmp/claude-1000/-home-password-Medical-Store-Management-System/d49784ec-5e61-4471-bc1c-8dbc6e57a22b/scratchpad/smoke_test.py /security/ /security/audit-logs /security/2fa/setup)",
+      "Bash(python3.10 /tmp/claude-1000/-home-password-Medical-Store-Management-System/d49784ec-5e61-4471-bc1c-8dbc6e57a22b/scratchpad/smoke_test.py /ai/ /ai/smart-reorder /ai/sales-forecast /ai/chatbot)",
+      "Bash(python3.10 /tmp/claude-1000/-home-password-Medical-Store-Management-System/d49784ec-5e61-4471-bc1c-8dbc6e57a22b/scratchpad/smoke_test.py / /dashboard/ /sales/billing /sales/ /gst/ /gst/gstr1 /gst/gstr3b /gst/hsn-summary /gst/itc /accounting/ /accounting/chart-of-accounts /accounting/journal/new /accounting/day-book /accounting/trial-balance /accounting/pl-statement /accounting/balance-sheet /abha/ /abha/qr-scan /eprescription/ /eprescription/import /whatsapp/ /whatsapp/logs /loyalty/ /loyalty/settings /medicines/generic-search /reports/ /security/ /security/audit-logs /security/2fa/setup /ai/ /ai/smart-reorder /ai/sales-forecast /ai/chatbot)",
+      "Bash(python3.10 scripts/bulk_seed_data.py)",
+      "Bash(mysql -u root -proot msms_dev -e \"SHOW COLUMNS FROM loyalty_transactions LIKE 'type';\")",
+      "Bash(mysql -u root -proot msms_dev -e \"ALTER TABLE loyalty_transactions MODIFY type ENUM\\('earn','redeem','expire','adjust','referral','cashback'\\) NOT NULL;\")",
+      "Bash(python3.10 /tmp/claude-1000/-home-password-Medical-Store-Management-System/d49784ec-5e61-4471-bc1c-8dbc6e57a22b/scratchpad/smoke_test.py / /sales/ /sales/billing /medicines/ /inventory/stock /suppliers/ /purchase/ /prescriptions/ /patients/ /doctors/ /gst/ /accounting/ /reports/ /security/ /security/audit-logs /ai/ /ai/smart-reorder /loyalty/ /whatsapp/ /abha/ /eprescription/ /branches/ /notifications/ /compliance/ /returns/ /barcode/)",
+      "Bash(timeout 20 google-chrome --headless --disable-gpu --enable-logging=stderr --v=1 --dump-dom \"http://127.0.0.1:5000/sales/billing\")",
+      "Bash(python3.10 /tmp/claude-1000/-home-password-Medical-Store-Management-System/d49784ec-5e61-4471-bc1c-8dbc6e57a22b/scratchpad/smoke_test.py /patients/ /patients/create /patients/6 /patients/6/edit)"
+    ]
+  }
+}

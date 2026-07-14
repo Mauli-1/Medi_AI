@@ -1,0 +1,10 @@
+{% extends "auth/auth_base.html" %}
+{% block auth_title %}403 — Access Denied{% endblock %}
+{% block auth_subtitle %}You don't have permission to view this page{% endblock %}
+{% block auth_body %}
+<div class="text-center py-3">
+  <div style="font-size:3rem;font-weight:700;color:var(--accent);letter-spacing:-.05em;">403</div>
+  <p class="text-muted mb-4">Your account role does not grant access to this resource. Contact your administrator if you believe this is an error.</p>
+  <a href="javascript:history.back()" class="btn btn-accent">Go Back</a>
+</div>
+{% endblock %}

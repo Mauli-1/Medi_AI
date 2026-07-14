@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% block title %}Counter Billing{% endblock %}
+{% block content %}
+<div class="d-flex gap-3" style="height:calc(100vh - 120px)">
+
+  <!-- LEFT: Cart -->
+  <div class="flex-grow-1 d-flex flex-column">
+    <div class="card mb-2">
+      <div class="card-body py-2 d-flex gap-2 align-items-center">
+        <select class="form-select form-select-sm w-auto" id="patientSelect">
+          <option value="">Walk-in Patient</option>
+          {% for p in patients %}
+          <option value="{{ p.id }}">{{ p.full_name }} — {{ p.phone }}</option>
+          {% endfor %}
+        </select>
+        <input type="text" class="form-control form-control-sm" id="medicineSearch" placeholder="Search medicine by name / barcode..." style="max-width:360px" autocomplete="off">
+        <select class="form-select form-select-sm w-auto" id="voiceLang">
+          <option value="en-IN">English</option>
+          <option value="hi-IN">हिंदी</option>
+          <option value="mr-IN">मराठी</option>
+        </select>
+        <button type="button" class="btn btn-sm btn-outline-secondary" id="voiceMicBtn" title="Voice billing">🎤</button>
+        <span id="voiceStatus" class="small text-muted"></span>
+        <div id="interactionAlert" class="alert alert-danger py-1 px-2 mb-0 d-none small" role="alert"></div>
+      </div>
+    </div>
+    <div id="voiceConfirmBar" class="alert alert-info py-2 px-3 mb-2 d-none d-flex justify-content-between align-items-center">
+      <span id="voiceConfirmText"></span>
+      <span>
+        <button type="button" class="btn btn-sm btn-success" id="voiceConfirmApply">Apply</button>
+        <button type="button" class="btn btn-sm btn-outline-secondary" id="voiceConfirmCancel">Cancel</button>
+      </span>
+    </div>
+    <div class="card flex-grow-1">
+      <div class="card-body p-0">
+        <div id="searchDropdown" class="position-absolute bg-white border rounded shadow-sm" style="z-index:1000;display:none;min-width:400px;max-height:300px;overflow-y:auto"></div>
+        <table class="table table-sm mb-0" id="cartTable">
+          <thead class="table-light">
+            <tr>
+              <th>Medicine</th><th>Batch</th><th>Expiry</th><th style="width:70px">Qty</th>
+              <th>MRP</th><th>Rate</th><th style="width:70px">Disc%</th>
+              <th>GST</th><th>Total</th><th></th>
+            </tr>
+          </thead>
+          <tbody id="cartBody">
+            <tr id="emptyRow"><td colspan="10" class="text-center text-muted py-4">Search and add medicines above</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: Totals + Payment -->
+  <div style="width:300px;flex-shrink:0">
+    <div class="card h-100">
+      <div class="card-body d-flex flex-column gap-3">
+        <h6 class="fw-bold mb-0" style="color:var(--accent)">Invoice Summary</h6>
+        <div class="d-flex justify-content-between"><span class="text-muted">Subtotal</span><span id="subtotal">₹0.00</span></div>
+        <div class="d-flex align-items-center gap-2">
+          <span class="text-muted">Disc%</span>
+          <input type="number" class="form-control form-control-sm" id="invoiceDisc" value="0" min="0" max="100" style="width:70px">
+          <span id="discAmount" class="ms-auto">-₹0.00</span>
+        </div>
+        <div class="d-flex justify-content-between"><span class="text-muted">CGST</span><span id="cgstTotal">₹0.00</span></div>
+        <div class="d-flex justify-content-between"><span class="text-muted">SGST</span><span id="sgstTotal">₹0.00</span></div>
+        <div class="d-flex justify-content-between fw-bold border-top pt-2"><span>Grand Total</span><span id="grandTotal" style="color:var(--accent)">₹0.00</span></div>
+
+        <div>
+          <label class="form-label small fw-semibold">Payment Mode</label>
+          <div class="btn-group w-100" id="paymentMode">
+            <button class="btn btn-sm btn-outline-secondary active" data-mode="cash">Cash</button>
+            <button class="btn btn-sm btn-outline-secondary" data-mode="upi">UPI</button>
+            <button class="btn btn-sm btn-outline-secondary" data-mode="card">Card</button>
+            <button class="btn btn-sm btn-outline-secondary" data-mode="credit">Credit</button>
+          </div>
+        </div>
+        <div id="cashFields">
+          <label class="form-label small">Cash Tendered (₹)</label>
+          <input type="number" class="form-control form-control-sm" id="cashTendered" placeholder="0.00">
+          <div class="mt-1 small text-success">Change: <span id="changeAmt">₹0.00</span></div>
+        </div>
+        <button class="btn btn-success mt-auto" id="generateBtn" onclick="generateInvoice()">
+          Generate Invoice
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Interaction Modal -->
+<div class="modal fade" id="interactionModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-warning"><h5 class="modal-title">⚠ Drug Interaction Warning</h5></div>
+      <div class="modal-body">
+        <div id="interactionBody"></div>
+        <div id="overrideReasonWrap" class="mt-3 d-none">
+          <label class="form-label small fw-semibold">Override reason (required for severe interactions)</label>
+          <textarea id="overrideReason" class="form-control form-control-sm" rows="2" placeholder="Reason for proceeding despite the interaction warning..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal" onclick="removeLastAdded()">Remove Medicine</button>
+        <button class="btn btn-warning" id="overrideContinueBtn">Override & Continue</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/billing.js') }}"></script>
+<script src="{{ url_for('static', filename='js/voice-billing.js') }}"></script>
+{% endblock %}

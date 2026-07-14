@@ -1,0 +1,1909 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Medical Store Management System – Client Verification</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+/* ── TOKENS ─────────────────────────────────────────── */
+:root {
+  --ground:   #F7F4EE;
+  --surface:  #EDEAE2;
+  --border:   #D4CFC4;
+  --text:     #1C1A16;
+  --text-mid: #5C574E;
+  --text-dim: #8F8B82;
+  --accent:   #1A6B5A;
+  --accent-lt:#E6F2EF;
+  --accent-2: #C8460A;
+  --white:    #FDFCF9;
+
+  --ff-display: 'DM Serif Display', Georgia, serif;
+  --ff-mono:    'IBM Plex Mono', 'Courier New', monospace;
+  --ff-ui:      'Inter', system-ui, sans-serif;
+
+  --radius: 3px;
+  --max-w: 1080px;
+}
+
+/* ── RESET ──────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--ground);
+  color: var(--text);
+  font-family: var(--ff-ui);
+  font-size: 15px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+img { max-width: 100%; display: block; }
+a { color: var(--accent); text-decoration: none; }
+a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* ── NAV ────────────────────────────────────────────── */
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
+}
+.nav-inner {
+  max-width: var(--max-w);
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 52px;
+}
+.nav-brand {
+  font-family: var(--ff-mono);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.nav-links {
+  display: flex;
+  gap: 0;
+  list-style: none;
+  overflow-x: auto;
+}
+.nav-links li a {
+  font-family: var(--ff-mono);
+  font-size: 11px;
+  letter-spacing: .05em;
+  color: var(--text-mid);
+  padding: 6px 12px;
+  border-radius: var(--radius);
+  white-space: nowrap;
+  transition: background .15s, color .15s;
+}
+.nav-links li a:hover { background: var(--accent-lt); color: var(--accent); }
+
+/* ── HERO ───────────────────────────────────────────── */
+.hero {
+  background: var(--accent);
+  color: var(--white);
+  padding: 80px 24px 72px;
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 39px,
+    rgba(255,255,255,.04) 39px,
+    rgba(255,255,255,.04) 40px
+  );
+  pointer-events: none;
+}
+.hero-inner {
+  max-width: var(--max-w);
+  margin: 0 auto;
+  position: relative;
+}
+.hero-eyebrow {
+  font-family: var(--ff-mono);
+  font-size: 11px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.55);
+  margin-bottom: 20px;
+}
+.hero-title {
+  font-family: var(--ff-display);
+  font-size: clamp(2.4rem, 5vw, 3.8rem);
+  line-height: 1.1;
+  font-weight: 400;
+  max-width: 680px;
+  margin-bottom: 16px;
+}
+.hero-subtitle {
+  font-family: var(--ff-mono);
+  font-size: 13px;
+  color: rgba(255,255,255,.7);
+  margin-bottom: 40px;
+  max-width: 520px;
+  line-height: 1.7;
+}
+.hero-meta {
+  display: flex;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+.hero-meta-item {
+  font-family: var(--ff-mono);
+  font-size: 11px;
+  letter-spacing: .06em;
+}
+.hero-meta-item strong {
+  display: block;
+  color: rgba(255,255,255,.5);
+  font-weight: 500;
+  margin-bottom: 2px;
+  text-transform: uppercase;
+  font-size: 10px;
+}
+.hero-meta-item span { color: var(--white); }
+
+.hero-stat-row {
+  display: flex;
+  gap: 40px;
+  flex-wrap: wrap;
+  margin-top: 48px;
+  padding-top: 32px;
+  border-top: 1px solid rgba(255,255,255,.18);
+}
+.hero-stat { text-align: left; }
+.hero-stat-num {
+  font-family: var(--ff-display);
+  font-size: 2.4rem;
+  line-height: 1;
+  color: var(--white);
+}
+.hero-stat-label {
+  font-family: var(--ff-mono);
+  font-size: 10px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.5);
+  margin-top: 4px;
+}
+
+/* ── LAYOUT ─────────────────────────────────────────── */
+.page-wrap {
+  max-width: var(--max-w);
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+/* ── SECTION HEADERS ────────────────────────────────── */
+.section-header {
+  margin: 64px 0 24px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--accent);
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+}
+.section-header h2 {
+  font-family: var(--ff-display);
+  font-size: 1.7rem;
+  font-weight: 400;
+  color: var(--text);
+}
+.section-tag {
+  font-family: var(--ff-mono);
+  font-size: 10px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: var(--accent-lt);
+  padding: 3px 8px;
+  border-radius: 2px;
+}
+
+/* ── MODULE CARD ────────────────────────────────────── */
+.module-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--accent);
+  border-radius: var(--radius);
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+.module-card-head {
+  padding: 20px 24px 16px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  cursor: pointer;
+  user-select: none;
+  transition: background .15s;
+}
+.module-card-head:hover { background: var(--accent-lt); }
+.module-card-head-left { display: flex; align-items: flex-start; gap: 16px; }
+.module-num {
+  font-family: var(--ff-mono);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent);
+  background: var(--accent-lt);
+  border: 1px solid rgba(26,107,90,.2);
+  padding: 4px 8px;
+  border-radius: 2px;
+  white-space: nowrap;
+  margin-top: 2px;
+}
+.module-title {
+  font-family: var(--ff-display);
+  font-size: 1.2rem;
+  font-weight: 400;
+  color: var(--text);
+  line-height: 1.3;
+}
+.module-desc {
+  font-size: 13px;
+  color: var(--text-mid);
+  margin-top: 4px;
+  line-height: 1.5;
+}
+.module-toggle {
+  font-family: var(--ff-mono);
+  font-size: 18px;
+  color: var(--accent);
+  transition: transform .2s;
+  flex-shrink: 0;
+}
+.module-card.open .module-toggle { transform: rotate(45deg); }
+.module-body {
+  display: none;
+  padding: 0 24px 24px;
+  border-top: 1px solid var(--border);
+}
+.module-card.open .module-body { display: block; }
+
+/* ── TABLES ─────────────────────────────────────────── */
+.tbl-wrap { overflow-x: auto; margin: 20px 0; }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--ff-mono);
+  font-size: 12.5px;
+}
+thead tr {
+  background: var(--surface);
+  border-bottom: 2px solid var(--border);
+}
+thead th {
+  text-align: left;
+  padding: 9px 14px;
+  font-weight: 600;
+  letter-spacing: .05em;
+  font-size: 10.5px;
+  text-transform: uppercase;
+  color: var(--text-mid);
+  white-space: nowrap;
+}
+tbody tr { border-bottom: 1px solid var(--border); }
+tbody tr:last-child { border-bottom: none; }
+tbody td {
+  padding: 9px 14px;
+  color: var(--text);
+  vertical-align: top;
+  line-height: 1.5;
+}
+tbody tr:nth-child(even) { background: rgba(237,234,226,.4); }
+.td-field { font-weight: 500; color: var(--accent); }
+.td-new {
+  font-size: 10px;
+  background: var(--accent-2);
+  color: white;
+  padding: 1px 6px;
+  border-radius: 2px;
+  letter-spacing: .05em;
+  font-weight: 600;
+  margin-left: 6px;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+/* ── FEATURE PILLS ──────────────────────────────────── */
+.feature-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 16px 0;
+}
+.feat {
+  font-family: var(--ff-mono);
+  font-size: 11px;
+  padding: 5px 11px;
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  color: var(--text-mid);
+  background: var(--surface);
+}
+.feat.feat-new {
+  border-color: var(--accent-2);
+  color: var(--accent-2);
+  background: rgba(200,70,10,.06);
+  font-weight: 600;
+}
+
+/* ── ROLE TABLE ─────────────────────────────────────── */
+.role-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+  margin: 20px 0;
+}
+.role-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+}
+.role-card-name {
+  font-family: var(--ff-mono);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent);
+  letter-spacing: .04em;
+  margin-bottom: 6px;
+}
+.role-card-desc {
+  font-size: 12px;
+  color: var(--text-mid);
+  line-height: 1.5;
+}
+
+/* ── TIMELINE ───────────────────────────────────────── */
+.timeline {
+  margin: 20px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.timeline-item {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: 0;
+  position: relative;
+}
+.timeline-item::before {
+  content: '';
+  position: absolute;
+  left: 111px;
+  top: 28px;
+  bottom: -1px;
+  width: 2px;
+  background: var(--border);
+}
+.timeline-item:last-child::before { display: none; }
+.timeline-phase {
+  font-family: var(--ff-mono);
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-dim);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  padding: 18px 0;
+  text-align: right;
+  padding-right: 24px;
+}
+.timeline-content {
+  border-left: 2px solid var(--accent);
+  padding: 16px 20px 24px;
+  position: relative;
+}
+.timeline-content::before {
+  content: '';
+  position: absolute;
+  left: -5px;
+  top: 22px;
+  width: 8px;
+  height: 8px;
+  background: var(--accent);
+  border-radius: 50%;
+}
+.timeline-title {
+  font-family: var(--ff-display);
+  font-size: 1rem;
+  font-weight: 400;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+.timeline-meta {
+  font-family: var(--ff-mono);
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+/* ── TECH STACK ─────────────────────────────────────── */
+.stack-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 10px;
+  margin: 20px 0;
+}
+.stack-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.stack-layer {
+  font-family: var(--ff-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+.stack-value {
+  font-family: var(--ff-mono);
+  font-size: 13px;
+  color: var(--accent);
+  font-weight: 500;
+}
+
+/* ── SIGN-OFF ────────────────────────────────────────── */
+.signoff-box {
+  background: var(--white);
+  border: 2px solid var(--accent);
+  border-radius: var(--radius);
+  padding: 36px 32px;
+  margin: 32px 0;
+}
+.signoff-title {
+  font-family: var(--ff-display);
+  font-size: 1.5rem;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+.signoff-sub {
+  font-size: 13px;
+  color: var(--text-mid);
+  margin-bottom: 28px;
+}
+.checkbox-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.checkbox-row input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--accent);
+  margin-top: 2px;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+.checkbox-row label {
+  font-size: 14px;
+  color: var(--text);
+  cursor: pointer;
+}
+.signoff-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-top: 28px;
+}
+.signoff-field label {
+  display: block;
+  font-family: var(--ff-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 6px;
+}
+.signoff-field input,
+.signoff-field textarea {
+  width: 100%;
+  background: var(--ground);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px 12px;
+  font-family: var(--ff-mono);
+  font-size: 13px;
+  color: var(--text);
+  outline: none;
+  transition: border-color .15s;
+}
+.signoff-field input:focus,
+.signoff-field textarea:focus { border-color: var(--accent); }
+.signoff-field textarea { resize: vertical; min-height: 80px; }
+.signoff-field.full { grid-column: 1 / -1; }
+.btn-primary {
+  display: inline-block;
+  margin-top: 24px;
+  background: var(--accent);
+  color: var(--white);
+  font-family: var(--ff-mono);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: .06em;
+  padding: 13px 28px;
+  border-radius: var(--radius);
+  border: none;
+  cursor: pointer;
+  transition: opacity .15s;
+}
+.btn-primary:hover { opacity: .88; }
+
+/* ── FOOTER ─────────────────────────────────────────── */
+.footer {
+  background: var(--text);
+  color: rgba(255,255,255,.5);
+  padding: 32px 24px;
+  margin-top: 64px;
+}
+.footer-inner {
+  max-width: var(--max-w);
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.footer-brand {
+  font-family: var(--ff-mono);
+  font-size: 12px;
+  color: rgba(255,255,255,.7);
+}
+.footer-meta {
+  font-family: var(--ff-mono);
+  font-size: 11px;
+}
+
+/* ── AI FEATURE GRID ────────────────────────────────── */
+.ai-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 12px;
+  margin: 20px 0;
+}
+.ai-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  border-left: 3px solid var(--accent-2);
+}
+.ai-card-name {
+  font-family: var(--ff-mono);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent-2);
+  margin-bottom: 6px;
+}
+.ai-card-desc {
+  font-size: 12px;
+  color: var(--text-mid);
+  line-height: 1.5;
+}
+
+/* ── KPI GRID ───────────────────────────────────────── */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 10px;
+  margin: 20px 0;
+}
+.kpi-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 16px;
+}
+.kpi-name {
+  font-family: var(--ff-mono);
+  font-size: 10px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 8px;
+}
+.kpi-value {
+  font-family: var(--ff-display);
+  font-size: 1.1rem;
+  color: var(--accent);
+}
+
+/* ── NON-FUNCTIONAL ─────────────────────────────────── */
+.nfr-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+  margin: 20px 0;
+}
+.nfr-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+}
+.nfr-cat {
+  font-family: var(--ff-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 6px;
+}
+.nfr-val {
+  font-size: 13px;
+  color: var(--text);
+  line-height: 1.5;
+}
+
+/* ── UTILITY ────────────────────────────────────────── */
+.mt-8  { margin-top: 8px; }
+.mt-16 { margin-top: 16px; }
+.mt-20 { margin-top: 20px; }
+.sub-head {
+  font-family: var(--ff-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--text-mid);
+  margin: 20px 0 10px;
+}
+.note {
+  font-family: var(--ff-mono);
+  font-size: 11.5px;
+  color: var(--text-mid);
+  background: var(--surface);
+  border-left: 3px solid var(--border);
+  padding: 10px 14px;
+  border-radius: 0 2px 2px 0;
+  margin: 12px 0;
+  line-height: 1.6;
+}
+
+/* ── REDUCED MOTION ─────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .hero-title-cursor { animation: none !important; }
+}
+
+/* ── RESPONSIVE ─────────────────────────────────────── */
+@media (max-width: 640px) {
+  .hero { padding: 56px 20px 48px; }
+  .hero-stat-row { gap: 24px; }
+  .signoff-fields { grid-template-columns: 1fr; }
+  .timeline-item { grid-template-columns: 90px 1fr; }
+  .nav-links { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav" aria-label="Section navigation">
+  <div class="nav-inner">
+    <span class="nav-brand">MSMS · v1.0</span>
+    <ul class="nav-links">
+      <li><a href="#overview">Overview</a></li>
+      <li><a href="#roles">Roles</a></li>
+      <li><a href="#modules">Modules</a></li>
+      <li><a href="#reports">Reports</a></li>
+      <li><a href="#ai">AI</a></li>
+      <li><a href="#tech">Architecture</a></li>
+      <li><a href="#timeline">Timeline</a></li>
+      <li><a href="#signoff">Sign-off</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="hero-inner">
+    <p class="hero-eyebrow">MCA Major Project · Client Verification Document · June 2026</p>
+    <h1 class="hero-title">Medical Store<br/>Management System</h1>
+    <p class="hero-subtitle">Complete field-by-field requirements across 28 modules — billing, inventory, compliance, GST, AI automation, and multi-branch operations for modern pharmacy management.</p>
+    <div class="hero-meta">
+      <div class="hero-meta-item">
+        <strong>Prepared by</strong>
+        <span>Saurabh B. Navatre</span>
+      </div>
+      <div class="hero-meta-item">
+        <strong>Project type</strong>
+        <span>MCA Major Project</span>
+      </div>
+      <div class="hero-meta-item">
+        <strong>Version</strong>
+        <span>1.0 – Verification Draft</span>
+      </div>
+      <div class="hero-meta-item">
+        <strong>Date</strong>
+        <span>June 2026</span>
+      </div>
+    </div>
+    <div class="hero-stat-row">
+      <div class="hero-stat">
+        <div class="hero-stat-num">28</div>
+        <div class="hero-stat-label">Modules</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-num">8</div>
+        <div class="hero-stat-label">User Roles</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-num">30+</div>
+        <div class="hero-stat-label">Reports</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-num">14</div>
+        <div class="hero-stat-label">AI Features</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-num">22 wk</div>
+        <div class="hero-stat-label">Delivery</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="page-wrap">
+
+  <!-- OVERVIEW -->
+  <section id="overview">
+    <div class="section-header">
+      <h2>Project Overview</h2>
+      <span class="section-tag">Purpose & Goals</span>
+    </div>
+    <p style="color:var(--text-mid);max-width:720px;line-height:1.7;font-size:14px;">This system automates end-to-end pharmacy operations — from medicine procurement and batch-wise stock tracking to GST-compliant billing, prescription management, ABHA integration, and AI-driven demand forecasting. It is designed for Indian retail and wholesale pharmacies operating under Schedule H/H1 compliance requirements.</p>
+
+    <div class="sub-head mt-16">Key Business Goals</div>
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Goal</th>
+            <th>Measurable Outcome</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td class="td-field">Reduce manual data entry</td><td>50% reduction in staff data-entry time</td></tr>
+          <tr><td class="td-field">Speed up counter billing</td><td>Invoice generated in under 1 second</td></tr>
+          <tr><td class="td-field">Prevent expiry losses</td><td>Real-time alerts 30/15/7 days before expiry</td></tr>
+          <tr><td class="td-field">GST compliance</td><td>Auto-calculated taxes; GSTR-1 and GSTR-3B ready</td></tr>
+          <tr><td class="td-field">Inventory turnover</td><td>Non-moving and dead stock identified automatically</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ROLES -->
+  <section id="roles">
+    <div class="section-header">
+      <h2>User Roles & Access Control</h2>
+      <span class="section-tag">8 Roles</span>
+    </div>
+    <div class="role-grid">
+      <div class="role-card">
+        <div class="role-card-name">Super Admin</div>
+        <div class="role-card-desc">Full system control — user management, configurations, all modules with CRUD and reports.</div>
+      </div>
+      <div class="role-card">
+        <div class="role-card-name">Owner</div>
+        <div class="role-card-desc">Business setup, financial overview, subscription management, all business and financial data.</div>
+      </div>
+      <div class="role-card">
+        <div class="role-card-name">Pharmacist</div>
+        <div class="role-card-desc">Prescription verification, dispensing, counseling. Billing requires approval for Schedule H drugs.</div>
+      </div>
+      <div class="role-card">
+        <div class="role-card-name">Cashier</div>
+        <div class="role-card-desc">Counter billing, payment collection, returns, and customer lookup.</div>
+      </div>
+      <div class="role-card">
+        <div class="role-card-name">Store Manager</div>
+        <div class="role-card-desc">Inventory oversight, staff coordination, daily operations, sales reports.</div>
+      </div>
+      <div class="role-card">
+        <div class="role-card-name">Inventory Manager</div>
+        <div class="role-card-desc">Stock entry, adjustments, audits, inter-branch transfers, and stock reports.</div>
+      </div>
+      <div class="role-card">
+        <div class="role-card-name">Accountant</div>
+        <div class="role-card-desc">Financial entries, GST filing, ledgers, P&L, and accounting reports.</div>
+      </div>
+      <div class="role-card">
+        <div class="role-card-name">Auditor</div>
+        <div class="role-card-desc">Read-only access across all modules for compliance review — no data modifications.</div>
+      </div>
+    </div>
+    <div class="note">Security: 2FA via OTP (SMS/Email), configurable session timeout (default 30 min), complete activity logs for every login and data change.</div>
+  </section>
+
+  <!-- MODULES -->
+  <section id="modules">
+    <div class="section-header">
+      <h2>Module Specifications</h2>
+      <span class="section-tag">28 Modules</span>
+    </div>
+
+    <!-- M1: Business Management -->
+    <div class="module-card" id="m1">
+      <div class="module-card-head" onclick="toggleModule('m1')" role="button" tabindex="0" aria-expanded="false" onkeydown="if(event.key==='Enter'||event.key===' ')toggleModule('m1')">
+        <div class="module-card-head-left">
+          <span class="module-num">MOD 01</span>
+          <div>
+            <div class="module-title">Business Management</div>
+            <div class="module-desc">Store profile, licenses, subscription, and payment gateway configuration.</div>
+          </div>
+        </div>
+        <span class="module-toggle" aria-hidden="true">+</span>
+      </div>
+      <div class="module-body">
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td class="td-field">Business ID</td><td>Auto-generated</td><td>Unique identifier</td></tr>
+              <tr><td class="td-field">Store Name</td><td>Text (50)</td><td>Official pharmacy name</td></tr>
+              <tr><td class="td-field">Owner Name</td><td>Text (50)</td><td>Proprietor or company director</td></tr>
+              <tr><td class="td-field">GST Number</td><td>Text (15)</td><td>15-digit alphanumeric, auto-validated via API</td></tr>
+              <tr><td class="td-field">Drug License Number</td><td>Text (20)</td><td>State drug license with expiry tracking</td></tr>
+              <tr><td class="td-field">FSSAI Number</td><td>Text (14)</td><td>Food safety license for nutraceuticals (optional)</td></tr>
+              <tr><td class="td-field">Business Type</td><td>Dropdown</td><td>Retail / Wholesale / Both / Online</td></tr>
+              <tr><td class="td-field">Registration Type</td><td>Dropdown</td><td>Sole Proprietorship / Partnership / Pvt Ltd / LLP</td></tr>
+              <tr><td class="td-field">Phone / Email</td><td>Text</td><td>Primary contact details</td></tr>
+              <tr><td class="td-field">Address</td><td>Text (255)</td><td>Street, area, landmark</td></tr>
+              <tr><td class="td-field">State / City / Pincode</td><td>Dropdown / Text</td><td>Location fields</td></tr>
+              <tr><td class="td-field">Logo Upload</td><td>Image PNG/JPG</td><td>Store logo for invoices</td></tr>
+              <tr><td class="td-field">Signature Upload</td><td>Image PNG/JPG</td><td>Digital signature for invoices</td></tr>
+              <tr><td class="td-field">Financial Year</td><td>Dropdown</td><td>e.g., 2026–27</td></tr>
+              <tr><td class="td-field">Subscription Plan</td><td>Dropdown</td><td>Basic / Premium / Enterprise</td></tr>
+              <tr><td class="td-field">Payment Gateway</td><td>Integration</td><td>Razorpay / PayU / Cashfree</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="sub-head">Features</div>
+        <div class="feature-list">
+          <span class="feat">Auto-GST validation via API</span>
+          <span class="feat">Drug license expiry alerts (30/15/7 days)</span>
+          <span class="feat">Profile completion tracker</span>
+          <span class="feat">Document storage (certificates)</span>
+          <span class="feat">Multiple business profiles</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- M2: User Management -->
+    <div class="module-card" id="m2">
+      <div class="module-card-head" onclick="toggleModule('m2')" role="button" tabindex="0" aria-expanded="false" onkeydown="if(event.key==='Enter'||event.key===' ')toggleModule('m2')">
+        <div class="module-card-head-left">
+          <span class="module-num">MOD 02</span>
+          <div>
+            <div class="module-title">User Management</div>
+            <div class="module-desc">Authentication, roles, permissions, 2FA, and activity logging.</div>
+          </div>
+        </div>
+        <span class="module-toggle" aria-hidden="true">+</span>
+      </div>
+      <div class="module-body">
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td class="td-field">User ID</td><td>Auto-generated</td><td>Unique identifier</td></tr>
+              <tr><td class="td-field">Full Name / Username</td><td>Text</td><td>Display name and unique login ID</td></tr>
+              <tr><td class="td-field">Password</td><td>Encrypted</td><td>BCrypt hashed — never stored as plain text</td></tr>
+              <tr><td class="td-field">Email / Phone</td><td>Text</td><td>For login and 2FA OTP delivery</td></tr>
+              <tr><td class="td-field">Role</td><td>Dropdown</td><td>From 8-role list; drives all permissions</td></tr>
+              <tr><td class="td-field">Permissions</td><td>JSON</td><td>Read/Write/Delete per module (granular)</td></tr>
+              <tr><td class="td-field">Status</td><td>Dropdown</td><td>Active / Inactive / Locked</td></tr>
+              <tr><td class="td-field">Last Login</td><td>Timestamp</td><td>Auto-recorded</td></tr>
+              <tr><td class="td-field">2FA Enabled</td><td>Boolean</td><td>TOTP or SMS OTP</td></tr>
+              <tr><td class="td-field">Session Token</td><td>JWT</td><td>Expires on timeout or logout</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="sub-head">Features</div>
+        <div class="feature-list">
+          <span class="feat">RBAC – page, button, and data level</span>
+          <span class="feat">Forgot password (email/SMS reset)</span>
+          <span class="feat">Session timeout (configurable)</span>
+          <span class="feat">Two-factor authentication (TOTP/SMS)</span>
+          <span class="feat">User activity logs</span>
+          <span class="feat">Super Admin-only registration</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- M3: Medicine Master -->
+    <div class="module-card" id="m3">
+      <div class="module-card-head" onclick="toggleModule('m3')" role="button" tabindex="0" aria-expanded="false" onkeydown="if(event.key==='Enter'||event.key===' ')toggleModule('m3')">
+        <div class="module-card-head-left">
+          <span class="module-num">MOD 03</span>
+          <div>
+            <div class="module-title">Medicine Master</div>
+            <div class="module-desc">Complete drug reference — 25+ fields per medicine including batch, schedule, GST, location.</div>
+          </div>
+        </div>
+        <span class="module-toggle" aria-hidden="true">+</span>
+      </div>
+      <div class="module-body">
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td class="td-field">Medicine ID</td><td>Auto-generated</td><td>MED-0001, barcode-compatible</td></tr>
+              <tr><td class="td-field">Medicine Name</td><td>Text (100)</td><td>Brand/Trade name</td></tr>
+              <tr><td class="td-field">Generic Name</td><td>Text (100)</td><td>International Non-proprietary Name (INN)</td></tr>
+              <tr><td class="td-field">Brand Name</td><td>Text (50)</td><td>Manufacturer's brand</td></tr>
+              <tr><td class="td-field">Salt Composition</td><td>Text (255)</td><td>e.g., Paracetamol 500mg + Cetirizine 10mg</td></tr>
+              <tr><td class="td-field">Category</td><td>Dropdown</td><td>Antibiotic / Analgesic / Antihistamine / etc.</td></tr>
+              <tr><td class="td-field">Manufacturer</td><td>Text (50)</td><td>Company name</td></tr>
+              <tr><td class="td-field">HSN Code</td><td>Numeric (8)</td><td>For GST classification</td></tr>
+              <tr><td class="td-field">Batch Number</td><td>Text (20)</td><td>Manufacturer's batch/lot</td></tr>
+              <tr><td class="td-field">Schedule Type</td><td>Dropdown</td><td>H / H1 / X (Narcotic) / G / OTC</td></tr>
+              <tr><td class="td-field">GST Rate (%)</td><td>Numeric</td><td>0, 5, 12, 18, or 28</td></tr>
+              <tr><td class="td-field">MRP (₹)</td><td>Decimal (10,2)</td><td>Maximum Retail Price</td></tr>
+              <tr><td class="td-field">Purchase Rate (₹)</td><td>Decimal (10,2)</td><td>Cost price per unit</td></tr>
+              <tr><td class="td-field">Selling Rate (₹)</td><td>Decimal (10,2)</td><td>Retail price (must be ≤ MRP)</td></tr>
+              <tr><td class="td-field">Barcode</td><td>Numeric (13)</td><td>EAN/UPC — scanned or generated</td></tr>
+              <tr><td class="td-field">QR Code</td><td>Text</td><td>QR-encoded medicine data</td></tr>
+              <tr><td class="td-field">Rack / Shelf Location</td><td>Text</td><td>e.g., R-12 / S-3</td></tr>
+              <tr><td class="td-field">Manufacturing / Expiry Date</td><td>Date</td><td>Batch-level dates</td></tr>
+              <tr><td class="td-field">Storage Condition</td><td>Dropdown</td><td>Room temp / Refrigerated / Cold chain</td></tr>
+              <tr><td class="td-field">Prescription Required</td><td>Boolean</td><td>Blocks billing without prescription upload</td></tr>
+              <tr><td class="td-field">Temperature Sensitive</td><td>Boolean</td><td>Flags cold-chain handling requirement</td></tr>
+              <tr><td class="td-field">Narcotic Drug Flag</td><td>Boolean</td><td>Triggers narcotic register entry</td></tr>
+              <tr><td class="td-field">Returnable Flag</td><td>Boolean</td><td>Marks eligibility for return to supplier</td></tr>
+              <tr><td class="td-field">Reorder Level</td><td>Numeric</td><td>Min quantity before reorder alert fires</td></tr>
+              <tr><td class="td-field">Max Stock Level</td><td>Numeric</td><td>Overstock alert threshold</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="sub-head">Features</div>
+        <div class="feature-list">
+          <span class="feat">Barcode + QR generation and label printing</span>
+          <span class="feat">Batch-wise expiry tracking</span>
+          <span class="feat">Auto ID with prefix (MED-0001)</span>
+          <span class="feat">Duplicate check (name + company + batch)</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- M4: Inventory -->
+    <div class="module-card" id="m4">
+      <div class="module-card-head" onclick="toggleModule('m4')" role="button" tabindex="0" aria-expanded="false" onkeydown="if(event.key==='Enter'||event.key===' ')toggleModule('m4')">
+        <div class="module-card-head-left">
+          <span class="module-num">MOD 04</span>
+          <div>
+            <div class="module-title">Inventory Management</div>
+            <div class="module-desc">Batch-wise stock tracking, FEFO/FIFO, non-moving stock analysis, expiry alerts. <span class="td-new">NEW</span></div>
+          </div>
+        </div>
+        <span class="module-toggle" aria-hidden="true">+</span>
+      </div>
+      <div class="module-body">
+        <div class="sub-head">Stock Types</div>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Stock Type</th><th>Definition</th></tr></thead>
+            <tbody>
+              <tr><td class="td-field">Current Stock</td><td>Physical quantity present in store</td></tr>
+              <tr><td class="td-field">Available Stock</td><td>Current minus reserved (pending bills)</td></tr>
+              <tr><td class="td-field">Reserved Stock</td><td>Items in cart, not yet billed</td></tr>
+              <tr><td class="td-field">Damaged Stock</td><td>Unusable quantity with damage record</td></tr>
+              <tr><td class="td-field">Expired Stock</td><td>Past expiry date; blocked from billing</td></tr>
+              <tr><td class="td-field">Returned Stock</td><td>Customer returns or supplier returns pending</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="sub-head">Non-Moving Stock Analysis <span class="td-new">NEW</span></div>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Parameter</th><th>Definition</th></tr></thead>
+            <tbody>
+              <tr><td class="td-field">Non-Moving</td><td>No sales in the selected period (30/60/90/180/365 days)</td></tr>
+              <tr><td class="td-field">Dead Stock</td><td>No sales in more than 180 days — auto-flagged for action</td></tr>
+              <tr><td class="td-field">Slow-Moving</td><td>Sales velocity below category average</td></tr>
+              <tr><td class="td-field">Fast-Moving</td><td>Sales velocity above category average</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note">Non-moving stock output includes: Medicine Name, Batch, Quantity, Last Sold Date, Stock Value, Days Since Last Sale. Dead stock auto-flagged for return/discount action.</div>
+        <div class="sub-head">Core Features</div>
+        <div class="feature-list">
+          <span class="feat">FEFO / FIFO batch selection</span>
+          <span class="feat">Auto batch selection at billing</span>
+          <span class="feat">Stock adjustment (write-off/write-in)</span>
+          <span class="feat">Stock transfer between branches</span>
+          <span class="feat">Physical audit vs system count</span>
+          <span class="feat">Rack-wise and branch-wise view</span>
+          <span class="feat">Reorder alerts + auto PO suggestion</span>
+          <span class="feat feat-new">Non-Moving Stock Report</span>
+          <span class="feat feat-new">Dead Stock Alert</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- M5: Supplier -->
+    <div class="module-card" id="m5">
+      <div class="module-card-head" onclick="toggleModule('m5')" role="button" tabindex="0" aria-expanded="false" onkeydown="if(event.key==='Enter'||event.key===' ')toggleModule('m5')">
+        <div class="module-card-head-left">
+          <span class="module-num">MOD 05</span>
+          <div>
+            <div class="module-title">Supplier Management</div>
+            <div class="module-desc">Supplier ledger, performance rating, outstanding payment aging.</div>
+          </div>
+        </div>
+        <span class="module-toggle" aria-hidden="true">+</span>
+      </div>
+      <div class="module-body">
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td class="td-field">Supplier ID</td><td>Auto-generated</td><td>SUP-0001</td></tr>
+              <tr><td class="td-field">Supplier Name</td><td>Text (50)</td><td>Company name</td></tr>
+              <tr><td class="td-field">Contact Person</td><td>Text (50)</td><td>Primary contact</td></tr>
+              <tr><td class="td-field">Phone / Email</td><td>Text</td><td>Communication</td></tr>
+              <tr><td class="td-field">GST Number</td><td>Text (15)</td><td>Auto-validated</td></tr>
+              <tr><td class="td-field">Drug License Number</td><td>Text (20)</td><td>Supplier's license</td></tr>
+              <tr><td class="td-field">Payment Terms</td><td>Dropdown</td><td>Credit / Cash / 15 days / 30 days</td></tr>
+              <tr><td class="td-field">Outstanding Balance</td><td>Decimal</td><td>Current dues</td></tr>
+              <tr><td class="td-field">Performance Rating</td><td>1–5</td><td>Auto-calculated from delivery/payment history</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="feature-list">
+          <span class="feat">Supplier ledger</span>
+          <span class="feat">Purchase history</span>
+          <span class="feat">Payment aging (30/60/90 days)</span>
+          <span class="feat">Performance rating</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- M6: Purchase with OCR -->
+    <div class="module-card" id="m6">
+      <div class="module-card-head" onclick="toggleModule('m6')" role="button" tabindex="0" aria-expanded="false" onkeydown="if(event.key==='Enter'||event.key===' ')toggleModule('m6')">
+        <div class="module-card-head-left">
+          <span class="module-num">MOD 06</span>
+          <div>
+            <div class="module-title">Purchase Management</div>
+            <div class="module-desc">PO, GRN, invoice matching, and AI-powered purchase bill OCR upload. <span class="td-new">NEW</span></div>
+          </div>
+        </div>
+        <span class="module-toggle" aria-hidden="true">+</span>
+      </div>
+      <div class="module-body">
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td class="td-field">PO Number</td><td>Auto-generated</td><td>PO-0001</td></tr>
+              <tr><td class="td-field">Invoice Number</td><td>Text (20)</td><td>Supplier's invoice number</td></tr>
+              <tr><td class="td-field">Supplier</td><td>Dropdown</td><td>From supplier master</td></tr>
+              <tr><td class="td-field">Date</td><td>Date</td><td>Purchase date</td></tr>
+              <tr><td class="td-field">Medicine / Batch / Expiry</td><td>Linked fields</td><td>Per-item stock entry</td></tr>
+              <tr><td class="td-field">Quantity / Rate / Discount</td><td>Numeric</td><td>Per item</td></tr>
+              <tr><td class="td-field">GST (%)</td><td>Numeric</td><td>Applicable rate per HSN</td></tr>
+              <tr><td class="td-field">Total Amount</td><td>Decimal</td><td>Auto-calculated</td></tr>
+              <tr><td class="td-field">GRN Status</td><td>Dropdown</td><td>Pending / Received / Partially Received</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="sub-head">OCR Bill Upload <span class="td-new">NEW</span></div>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Feature</th><th>Detail</th></tr></thead>
+            <tbody>
+              <tr><td class="td-field">Upload formats</td><td>JPG, JPEG, PNG, PDF (camera or gallery)</td></tr>
+              <tr><td class="td-field">OCR engine</td><td>Tesseract + custom-trained pharmacy model</td></tr>
+              <tr><td class="td-field">Auto-detected fields</td><td>Medicine name, batch, expiry, rate, GST, supplier</td></tr>
+              <tr><td class="td-field">Confidence threshold</td><td>Below 80% → manual review required before stock entry</td></tr>
+              <tr><td class="td-field">Duplicate check</td><td>Prevents re-entry of same invoice number</td></tr>
+              <tr><td class="td-field">Audit log</td><td>OCR confidence score recorded per bill</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note">Workflow: Create PO → Receive goods (GRN) → Auto-update stock → Link invoice → Track supplier payment.</div>
+      </div>
+    </div>
+
+    <!-- M7: Billing -->
+    <div class="module-card" id="m7">
+      <div class="module-card-head" onclick="toggleModule('m7')" role="button" tabindex="0" aria-expanded="false" onkeydown="if(event.key==='Enter'||event.key===' ')toggleModule('m7')">
+        <div class="module-card-head-left">
+          <span class="module-num">MOD 07</span>
+          <div>
+            <div class="module-title">Billing (Sales)</div>
+            <div class="module-desc">Retail, wholesale, GST, and credit billing with barcode scan, split payment, and voice billing. <span class="td-new">NEW</span></div>
+          </div>
+        </div>
+        <span class="module-toggle" aria-hidden="true">+</span>
+      </div>
+      <div class="module-body">
+        <div class="sub-head">Billing Types</div>
+        <div class="feature-list">
+          <span class="feat">Retail (counter)</span>
+          <span class="feat">Wholesale (bulk with discount)</span>
+          <span class="feat">GST Invoice</span>
+          <span class="feat">Estimate / Proforma</span>
+          <span class="feat">Credit billing</span>
+          <span class="feat">Cash billing</span>
+          <span class="feat">Home delivery billing</span>
+        </div>
+        <div class="sub-head">Invoice Fields</div>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Field</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td class="td-field">Invoice Number</td><td>Auto-generated (INV-0001)</td></tr>
+              <tr><td class="td-field">Date & Time</td><td>Billing timestamp</td></tr>
+              <tr><td class="td-field">Customer / Patient Name</td><td>Optional for retail; mandatory for Schedule H</td></tr>
+              <tr><td class="td-field">Prescription ID</td><td>Linked if prescription-required medicine</td></tr>
+              <tr><td class="td-field">Medicine list</td><td>Item, batch, quantity, rate, discount, GST per line</td></tr>
+              <tr><td class="td-field">CGST / SGST / IGST</td><td>Auto-calculated by intra/inter-state</td></tr>
+              <tr><td class="td-field">Round Off</td><td>Nearest rupee</td></tr>
+              <tr><td class="td-field">Payment Mode</td><td>Cash, UPI, Card, Wallet, Net Banking, Gift Card</td></tr>
+              <tr><td class="td-field">Split Payment</td><td>Multiple modes in one transaction</td></tr>
+              <tr><td class="td-field">Payment Status</td><td>Paid / Partially Paid / Unpaid</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="sub-head">Voice Billing <span class="td-new">NEW</span></div>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Command</th><th>Example</th></tr></thead>
+            <tbody>
+              <tr><td class="td-field">Voice search</td><td>"Add Paracetamol 500mg 2 strips"</td></tr>
+              <tr><td class="td-field">Quantity entry</td><td>"Quantity 5"</td></tr>
+              <tr><td class="td-field">Discount</td><td>"Apply 5 percent discount"</td></tr>
+              <tr><td class="td-field">Checkout</td><td>"Generate bill"</td></tr>
+              <tr><td class="td-field">Language support</td><td>English, Hindi, Marathi</td></tr>
+              <tr><td class="td-field">Confidence threshold</td><td>Below 85% → prompts pharmacist to confirm</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note">Business rules: Selling price ≤ MRP enforced. Expired medicines blocked at cart. Prescription-required medicines require upload before billing proceeds.</div>
+      </div>
+    </div>
+
+    <!-- M8: Prescription -->
+    <div class="module-card" id="m8">
+      <div class="module-card-head" onclick="toggleModule('m8')" role="button" tabindex="0" aria-expanded="false" onkeydown="if(event.key==='Enter'||event.key===' ')toggleModule('m8')">
+        <div class="module-card-head-left">
+          <span class="module-num">MOD 08</span>
+          <div>
+            <div class="module-title">Prescription Management</div>
+            <div class="module-desc">Upload, OCR extraction, verification, refill tracking, and e-prescription import.</div>
+          </div>
+        </div>
+        <span class="module-toggle" aria-hidden="true">+</span>
+      </div>
+      <div class="module-body">
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td class="td-field">Prescription ID</td><td>Auto-generated</td><td>RX-0001</td></tr>
+              <tr><td class="td-field">Patient Name / Age / Gender</td><td>Text / Numeric / Dropdown</td><td>Basic demographics</td></tr>
+              <tr><td class="td-field">Doctor Name + Reg. No.</td><td>Text</td><td>Verified against doctor master</td></tr>
+              <tr><td class="td-field">Upload Date</td><td>Date</td><td>When prescription was received</td></tr>
+              <tr><td class="td-field">OCR Extracted Text</td><td>Text</td><td>Full OCR output for audit</td></tr>
+              <tr><td class="td-field">Medicine List</td><td>JSON</td><td>Extracted medicines mapped to master</td></tr>
+              <tr><td class="td-field">Status</td><td>Dropdown</td><td>Pending / Verified / Dispensed / Rejected</td></tr>
+              <tr><td class="td-field">Refill Count</td><td>Numeric</td><td>Remaining refills allowed</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="feature-list">
+          <span class="feat">Upload JPG / PNG / PDF</span>
+          <span class="feat">Camera capture (webcam/mobile)</span>
+          <span class="feat">OCR medicine extraction</span>
+          <span class="feat">Auto map to medicine master</span>
+          <span class="feat">E-prescription import</span>
+          <span class="feat">Refill tracking and alerts</span>
+          <span class="feat">Prescription viewer (zoom/rotate)</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- M9: Patient -->
+    <div class="module-card" id="m9">
+      <div class="module-card-head" onclick="toggleModule('m9')" role="button" tabindex="0" aria-expanded="false" onkeydown="if(event.key==='Enter'||event.key===' ')toggleModule('m9')">
+        <div class="module-card-head-left">
+          <span class="module-num">MOD 09</span>
+          <div>
+            <div class="module-title">Patient Management</div>
+            <div class="module-desc">Patient profiles, purchase history, ABHA ID linking, credit tracking.</div>
+          </div>
+        </div>
+        <span class="module-toggle" aria-hidden="true">+</span>
+      </div>
+      <div class="module-body">
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td class="td-field">Patient ID</td><td>Auto-generated</td><td>PAT-0001</td></tr>
+              <tr><td class="td-field">Name / Age / Gender</td><td>Text / Numeric / Dropdown</td><td>Demographics</td></tr>
+              <tr><td class="td-field">Phone / Email</td><td>Text</td><td>Contact</td></tr>
+              <tr><td class="td-field">Address</td><td>Text (255)</td><td>For Schedule H compliance</td></tr>
+              <tr><td class="td-field">Blood Group</td><td>Dropdown</td><td>A+, A-, B+, B-, AB+, AB-, O+, O-</td></tr>
+              <tr><td class="td-field">ABHA ID</td><td>Text (14)</td><td>Ayushman Bharat Health Account ID</td></tr>
+              <tr><td class="td-field">Credit Limit</td><td>Decimal</td><td>Max credit allowed</td></tr>
+              <tr><td class="td-field">Outstanding Balance</td><td>Decimal</td><td>Current amount due</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- M10: Doctor -->
+    <div class="module-card" id="m10">
+      <div class="module-card-head" onclick="toggleModule('m10')" role="button" tabindex="0" aria-expanded="false" onkeydown="if(event.key==='Enter'||event.key===' ')toggleModule('m10')">
+        <div class="module-card-head-left">
+          <span class="module-num">MOD 10</span>
+          <div>
+            <div class="module-title">Doctor Management</div>
+            <div class="module-desc">Doctor registry, license verification, top prescribing doctors report.</div>
+          </div>
+        </div>
+        <span class="module-toggle" aria-hidden="true">+</span>
+      </div>
+      <div class="module-body">
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td class="td-field">Doctor ID</td><td>Auto-generated</td><td>DOC-0001</td></tr>
+              <tr><td class="td-field">Doctor Name</td><td>Text (50)</td><td></td></tr>
+              <tr><td class="td-field">Registration Number</td><td>Text (20)</td><td>MCI/State council reg no.</td></tr>
+              <tr><td class="td-field">Specialization</td><td>Text (50)</td><td>Cardiology, Dermatology, etc.</td></tr>
+              <tr><td class="td-field">Hospital/Clinic</td><td>Text (50)</td><td></td></tr>
+              <tr><td class="td-field">Phone / Email</td><td>Text</td><td>Contact</td></tr>
+              <tr><td class="td-field">Prescriptions Count</td><td>Numeric</td><td>Auto-incremented</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- M11: GST -->
+    <div class="module-card" id="m11">
+      <div class="module-card-head" onclick="toggleModule('m11')" role="button" tabindex="0" aria-expanded="false" onkeydown="if(event.key==='Enter'||event.key===' ')toggleModule('m11')">
+        <div class="module-card-head-left">
+          <span class="module-num">MOD 11</span>
+          <div>
+            <div class="module-title">GST & Tax Management</div>
+            <div class="module-desc">Auto CGST/SGST/IGST calculation, HSN summary, GSTR-1 and GSTR-3B ready reports.</div>
+          </div>
+        </div>
+        <span class="module-toggle" aria-hidden="true">+</span>
+      </div>
+      <div class="module-body">
+        <div class="feature-list">
+          <span class="feat">Auto CGST/SGST/IGST by intra/inter-state</span>
+          <span class="feat">HSN-wise sales summary</span>
+          <span class="feat">GSTR-1 (outward supplies)</span>
+          <span class="feat">GSTR-3B (summary return)</span>
+          <span class="feat">Input Tax Credit (ITC) tracking</span>
+          <span class="feat">Purchase tax auto-capture</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- M12: Accounting -->
+    <div class="module-card" id="m12">
+      <div class="module-card-head" onclick="toggleModule('m12')" role="button" tabindex="0" aria-expanded="false" onkeydown="if(event.key==='Enter'||event.key===' ')toggleModule('m12')">
+        <div class="module-card-head-left">
+          <span class="module-num">MOD 12</span>
+          <div>
+            <div class="module-title">Accounting</div>
+            <div class="module-desc">Ledger, P&L, balance sheet, auto-posting from every transaction.</div>
+          </div>
+        </div>
+        <span class="module-toggle" aria-hidden="true">+</span>
+      </div>
+      <div class="module-body">
+        <div class="feature-list">
+          <span class="feat">Cash receipt / payment</span>
+          <span class="feat">Journal entry</span>
+          <span class="feat">Day book</span>
+          <span class="feat">Ledger (customer, supplier, bank, cash)</span>
+          <span class="feat">Trial balance</span>
+          <span class="feat">Profit & Loss statement</span>
+          <span class="feat">Balance sheet</span>
+          <span class="feat">Cash flow statement</span>
+          <span class="feat">Auto ledger posting from every sale/purchase</span>
+          <span class="feat">Auto COGS calculation</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- M13-M14: Returns -->
+    <div class="module-card" id="m13">
+      <div class="module-card-head" onclick="toggleModule('m13')" role="button" tabindex="0" aria-expanded="false" onkeydown="if(event.key==='Enter'||event.key===' ')toggleModule('m13')">
+        <div class="module-card-head-left">
+          <span class="module-num">MOD 13–14</span>
+          <div>
+            <div class="module-title">Sales Return & Purchase Return</div>
+            <div class="module-desc">Customer returns with credit note, and supplier returns with damage photo.</div>
+          </div>
+        </div>
+        <span class="module-toggle" aria-hidden="true">+</span>
+      </div>
+      <div class="module-body">
+        <div class="sub-head">Sales Return Fields</div>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Field</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td class="td-field">Return ID</td><td>Auto-generated</td></tr>
+              <tr><td class="td-field">Original Invoice No</td><td>Linked to original sale</td></tr>
+              <tr><td class="td-field">Reason</td><td>Damaged / Expired / Wrong medicine / Other</td></tr>
+              <tr><td class="td-field">Action Taken</td><td>Refund / Replacement / Credit Note</td></tr>
+              <tr><td class="td-field">Approved By</td><td>Pharmacist or Store Manager</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="sub-head">Purchase Return Fields</div>
+        <div class="feature-list">
+          <span class="feat">Return to supplier (damaged/expired/excess)</span>
+          <span class="feat">Auto-suggest expired return</span>
+          <span class="feat">Photo attachment for damage</span>
+          <span class="feat">Status: Pending / Approved / Returned</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- M15: Drug Interaction -->
+    <div class="module-card" id="m15">
+      <div class="module-card-head" onclick="toggleModule('m15')" role="button" tabindex="0" aria-expanded="false" onkeydown="if(event.key==='Enter'||event.key===' ')toggleModule('m15')">
+        <div class="module-card-head-left">
+          <span class="module-num">MOD 15</span>
+          <div>
+            <div class="module-title">Drug Interaction Alerts</div>
+            <div class="module-desc">Real-time drug-drug, drug-food, and drug-allergy warnings during billing.</div>
+          </div>
+        </div>
+        <span class="module-toggle" aria-hidden="true">+</span>
+      </div>
+      <div class="module-body">
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Level</th><th>Color</th><th>Meaning</th></tr></thead>
+            <tbody>
+              <tr><td class="td-field">Severe</td><td>🔴 Red</td><td>Contraindicated — may cause life-threatening reaction</td></tr>
+              <tr><td class="td-field">Moderate</td><td>🟠 Orange</td><td>Monitor closely — significant interaction possible</td></tr>
+              <tr><td class="td-field">Minor</td><td>🟡 Yellow</td><td>Mild interaction — generally safe with awareness</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="feature-list">
+          <span class="feat">Warning popup at cart</span>
+          <span class="feat">Override with pharmacist reason</span>
+          <span class="feat">Override audit trail (user + timestamp)</span>
+          <span class="feat">Drug-Drug, Drug-Food, Drug-Allergy data</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- M16: Generic Search -->
+    <div class="module-card" id="m16">
+      <div class="module-card-head" onclick="toggleModule('m16')" role="button" tabindex="0" aria-expanded="false" onkeydown="if(event.key==='Enter'||event.key===' ')toggleModule('m16')">
+        <div class="module-card-head-left">
+          <span class="module-num">MOD 16</span>
+          <div>
+            <div class="module-title">Generic Search</div>
+            <div class="module-desc">Search by salt, find generic substitutes, compare brands and prices.</div>
+          </div>
+        </div>
+        <span class="module-toggle" aria-hidden="true">+</span>
+      </div>
+      <div class="module-body">
+        <div class="feature-list">
+          <span class="feat">Salt search → all brands</span>
+          <span class="feat">Generic substitute recommendation</span>
+          <span class="feat">Alternative brands (same salt)</span>
+          <span class="feat">Price comparison (MRP vs selling)</span>
+          <span class="feat">Stock availability across branches</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- M17: Compliance -->
+    <div class="module-card" id="m17">
+      <div class="module-card-head" onclick="toggleModule('m17')" role="button" tabindex="0" aria-expanded="false" onkeydown="if(event.key==='Enter'||event.key===' ')toggleModule('m17')">
+        <div class="module-card-head-left">
+          <span class="module-num">MOD 17</span>
+          <div>
+            <div class="module-title">Compliance – Schedule H/H1 & Narcotics</div>
+            <div class="module-desc">Mandatory dispensing registers, drug inspector reports, narcotic balance tracking.</div>
+          </div>
+        </div>
+        <span class="module-toggle" aria-hidden="true">+</span>
+      </div>
+      <div class="module-body">
+        <div class="sub-head">Mandatory Fields for Schedule H1 / Narcotic Dispensing</div>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Field</th><th>Mandatory</th></tr></thead>
+            <tbody>
+              <tr><td class="td-field">Doctor Name</td><td>Yes</td></tr>
+              <tr><td class="td-field">Doctor Registration Number</td><td>Yes</td></tr>
+              <tr><td class="td-field">Patient Name</td><td>Yes</td></tr>
+              <tr><td class="td-field">Patient Mobile Number</td><td>Yes</td></tr>
+              <tr><td class="td-field">Patient Address</td><td>Yes</td></tr>
+              <tr><td class="td-field">Medicine Name + Quantity</td><td>Yes</td></tr>
+              <tr><td class="td-field">Date of Sale</td><td>Yes</td></tr>
+              <tr><td class="td-field">Prescription Image</td><td>Yes</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="feature-list">
+          <span class="feat">Schedule H register</span>
+          <span class="feat">Schedule H1 register (extended fields)</span>
+          <span class="feat">Narcotic drug register (quantity balance)</span>
+          <span class="feat">Drug Inspector report (PDF)</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- M19: Dashboard -->
+    <div class="module-card" id="m19">
+      <div class="module-card-head" onclick="toggleModule('m19')" role="button" tabindex="0" aria-expanded="false" onkeydown="if(event.key==='Enter'||event.key===' ')toggleModule('m19')">
+        <div class="module-card-head-left">
+          <span class="module-num">MOD 19</span>
+          <div>
+            <div class="module-title">Dashboard</div>
+            <div class="module-desc">KPIs, trend charts, inventory health, and new dead stock widgets.</div>
+          </div>
+        </div>
+        <span class="module-toggle" aria-hidden="true">+</span>
+      </div>
+      <div class="module-body">
+        <div class="kpi-grid">
+          <div class="kpi-card"><div class="kpi-name">Today's Sales</div><div class="kpi-value">Real-time</div></div>
+          <div class="kpi-card"><div class="kpi-name">Monthly Sales</div><div class="kpi-value">Current month</div></div>
+          <div class="kpi-card"><div class="kpi-name">Today's Profit</div><div class="kpi-value">Gross margin</div></div>
+          <div class="kpi-card"><div class="kpi-name">Low Stock Count</div><div class="kpi-value">Below reorder</div></div>
+          <div class="kpi-card"><div class="kpi-name">Expiry Count</div><div class="kpi-value">Next 30 days</div></div>
+          <div class="kpi-card"><div class="kpi-name">Outstanding</div><div class="kpi-value">Credit due</div></div>
+          <div class="kpi-card"><div class="kpi-name">Inventory Value</div><div class="kpi-value">At cost price</div></div>
+          <div class="kpi-card" style="border-color:var(--accent-2)"><div class="kpi-name" style="color:var(--accent-2)">Non-Moving Count ✦</div><div class="kpi-value">90+ days idle</div></div>
+          <div class="kpi-card" style="border-color:var(--accent-2)"><div class="kpi-name" style="color:var(--accent-2)">Dead Stock Value ✦</div><div class="kpi-value">180+ days idle</div></div>
+        </div>
+        <div class="note">✦ New widgets. Charts include: Sales Trend, Purchase Trend, Top 10 Medicines, Revenue vs Expense, Expiry Distribution by month.</div>
+      </div>
+    </div>
+
+    <!-- M20: Notifications -->
+    <div class="module-card" id="m20">
+      <div class="module-card-head" onclick="toggleModule('m20')" role="button" tabindex="0" aria-expanded="false" onkeydown="if(event.key==='Enter'||event.key===' ')toggleModule('m20')">
+        <div class="module-card-head-left">
+          <span class="module-num">MOD 20</span>
+          <div>
+            <div class="module-title">Notifications & Alerts</div>
+            <div class="module-desc">SMS, Email, WhatsApp, and in-app alerts for all critical events.</div>
+          </div>
+        </div>
+        <span class="module-toggle" aria-hidden="true">+</span>
+      </div>
+      <div class="module-body">
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Alert</th><th>Trigger</th></tr></thead>
+            <tbody>
+              <tr><td class="td-field">Low Stock</td><td>Quantity ≤ reorder level</td></tr>
+              <tr><td class="td-field">Expiry Alert</td><td>30/15/7 days before expiry</td></tr>
+              <tr><td class="td-field">Non-Moving Stock</td><td>No sales for 90+ days</td></tr>
+              <tr><td class="td-field">Dead Stock</td><td>No sales for 180+ days</td></tr>
+              <tr><td class="td-field">GST Due</td><td>Monthly/quarterly filing deadline</td></tr>
+              <tr><td class="td-field">Subscription Renewal</td><td>30/15/7 days before plan expires</td></tr>
+              <tr><td class="td-field">Drug License Renewal</td><td>30/15 days before expiry</td></tr>
+              <tr><td class="td-field">OCR Processing Failure</td><td>Confidence below threshold</td></tr>
+              <tr><td class="td-field">Voice Recognition Failure</td><td>Confidence below threshold</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="sub-head">Channels</div>
+        <div class="feature-list">
+          <span class="feat">SMS (via gateway)</span>
+          <span class="feat">Email</span>
+          <span class="feat">WhatsApp Business API</span>
+          <span class="feat">In-app (bell icon)</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- M21-M28 grouped summary -->
+    <div class="module-card" id="m21">
+      <div class="module-card-head" onclick="toggleModule('m21')" role="button" tabindex="0" aria-expanded="false" onkeydown="if(event.key==='Enter'||event.key===' ')toggleModule('m21')">
+        <div class="module-card-head-left">
+          <span class="module-num">MOD 21</span>
+          <div>
+            <div class="module-title">Multi-Branch Management</div>
+            <div class="module-desc">Separate inventory, billing, and purchases per branch with a central consolidated view.</div>
+          </div>
+        </div>
+        <span class="module-toggle" aria-hidden="true">+</span>
+      </div>
+      <div class="module-body">
+        <div class="feature-list">
+          <span class="feat">Separate stock per branch</span>
+          <span class="feat">Branch-wise invoices</span>
+          <span class="feat">Inter-branch stock transfer with note</span>
+          <span class="feat">Branch-wise sales, profit, stock reports</span>
+          <span class="feat">Central consolidated dashboard</span>
+          <span class="feat">Branch-specific GST and drug license</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="module-card" id="m22">
+      <div class="module-card-head" onclick="toggleModule('m22')" role="button" tabindex="0" aria-expanded="false" onkeydown="if(event.key==='Enter'||event.key===' ')toggleModule('m22')">
+        <div class="module-card-head-left">
+          <span class="module-num">MOD 22–23</span>
+          <div>
+            <div class="module-title">ABHA Integration & E-Prescription</div>
+            <div class="module-desc">ABDM API-linked patient verification and e-prescription import with digital signature check.</div>
+          </div>
+        </div>
+        <span class="module-toggle" aria-hidden="true">+</span>
+      </div>
+      <div class="module-body">
+        <div class="feature-list">
+          <span class="feat">ABHA ID verification via ABDM API</span>
+          <span class="feat">QR scan from ABHA card</span>
+          <span class="feat">Patient profile auto-population</span>
+          <span class="feat">Health record linking (with consent)</span>
+          <span class="feat">E-prescription import from doctor portals</span>
+          <span class="feat">Digital signature verification</span>
+          <span class="feat">Auto-populate billing from e-prescription</span>
+          <span class="feat">Formats: XML (CDA), JSON, signed PDF</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="module-card" id="m24">
+      <div class="module-card-head" onclick="toggleModule('m24')" role="button" tabindex="0" aria-expanded="false" onkeydown="if(event.key==='Enter'||event.key===' ')toggleModule('m24')">
+        <div class="module-card-head-left">
+          <span class="module-num">MOD 24–25</span>
+          <div>
+            <div class="module-title">Customer Loyalty & WhatsApp</div>
+            <div class="module-desc">Points, membership tiers, referrals, and WhatsApp invoice and reminder delivery.</div>
+          </div>
+        </div>
+        <span class="module-toggle" aria-hidden="true">+</span>
+      </div>
+      <div class="module-body">
+        <div class="feature-list">
+          <span class="feat">1 point per ₹100 spent</span>
+          <span class="feat">Silver / Gold / Platinum tiers</span>
+          <span class="feat">Referral bonus points</span>
+          <span class="feat">Auto-discount by tier</span>
+          <span class="feat">WhatsApp invoice (PDF/image)</span>
+          <span class="feat">Payment reminders on WhatsApp</span>
+          <span class="feat">Refill reminders for chronic medicines</span>
+          <span class="feat">WhatsApp Business API (Meta)</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="module-card" id="m26">
+      <div class="module-card-head" onclick="toggleModule('m26')" role="button" tabindex="0" aria-expanded="false" onkeydown="if(event.key==='Enter'||event.key===' ')toggleModule('m26')">
+        <div class="module-card-head-left">
+          <span class="module-num">MOD 26–27</span>
+          <div>
+            <div class="module-title">Barcode & QR · Security</div>
+            <div class="module-desc">EAN-13 label generation, UPI QR payment, AES-256 encryption, and audit logs.</div>
+          </div>
+        </div>
+        <span class="module-toggle" aria-hidden="true">+</span>
+      </div>
+      <div class="module-body">
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Security Feature</th><th>Detail</th></tr></thead>
+            <tbody>
+              <tr><td class="td-field">Password hashing</td><td>BCrypt</td></tr>
+              <tr><td class="td-field">Transport encryption</td><td>HTTPS/SSL for all communication</td></tr>
+              <tr><td class="td-field">Data at rest</td><td>AES-256 encryption (patient data, prescriptions)</td></tr>
+              <tr><td class="td-field">Audit logs</td><td>Every critical action: who, when, what</td></tr>
+              <tr><td class="td-field">Backup</td><td>Daily incremental + weekly full (AWS S3 Glacier)</td></tr>
+              <tr><td class="td-field">Download tracking</td><td>Logs who downloaded which report or prescription</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- REPORTS -->
+  <section id="reports">
+    <div class="section-header">
+      <h2>Reports</h2>
+      <span class="section-tag">Module 18 · 30+ Reports</span>
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Category</th><th>Reports</th></tr></thead>
+        <tbody>
+          <tr><td class="td-field">Sales</td><td>Daily, Monthly, Yearly, Medicine-wise, Customer-wise, Pharmacist-wise, Tax-wise</td></tr>
+          <tr><td class="td-field">Purchase</td><td>Purchase Register, Supplier-wise, Product-wise, <strong>OCR Imported Purchase</strong>, Purchase Audit</td></tr>
+          <tr><td class="td-field">Inventory</td><td>Stock Summary, Low Stock, Expiry Near, Dead Stock, <strong>Non-Moving</strong>, <strong>Slow-Moving</strong>, <strong>Fast-Moving</strong>, Overstock, Batch-wise, Rack-wise</td></tr>
+          <tr><td class="td-field">Financial</td><td>P&L, Balance Sheet, Cash Flow, Ledger, Trial Balance, Day Book</td></tr>
+          <tr><td class="td-field">GST</td><td>GSTR-1, GSTR-3B, HSN Summary, ITC Report</td></tr>
+          <tr><td class="td-field">Compliance</td><td>Schedule H Register, Schedule H1 Register, Narcotic Register, Drug Inspector Report</td></tr>
+          <tr><td class="td-field">Billing</td><td><strong>Voice Billing Usage Report</strong>, Counter Performance, Discount Report, Coupon Report</td></tr>
+          <tr><td class="td-field">Patient / Doctor</td><td>Patient Purchase History, Top Prescribing Doctors</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="note">All reports exportable in PDF, Excel, and CSV formats.</div>
+  </section>
+
+  <!-- AI -->
+  <section id="ai">
+    <div class="section-header">
+      <h2>AI & Smart Automation</h2>
+      <span class="section-tag">Module 28 · 14 Features</span>
+    </div>
+    <div class="ai-grid">
+      <div class="ai-card">
+        <div class="ai-card-name">AI Prescription Reader</div>
+        <div class="ai-card-desc">OCR + Named Entity Recognition to extract medicine names, dosage, and duration from handwritten prescriptions.</div>
+      </div>
+      <div class="ai-card">
+        <div class="ai-card-name">AI Purchase Bill OCR</div>
+        <div class="ai-card-desc">Extracts medicine name, batch, expiry, rate, and GST from supplier invoices (photo or PDF).</div>
+      </div>
+      <div class="ai-card">
+        <div class="ai-card-name">AI Medicine Recognition</div>
+        <div class="ai-card-desc">Identifies a medicine from a photo of the packaging or blister strip.</div>
+      </div>
+      <div class="ai-card">
+        <div class="ai-card-name">AI Sales Forecasting</div>
+        <div class="ai-card-desc">Predicts daily and weekly sales volumes by medicine category.</div>
+      </div>
+      <div class="ai-card">
+        <div class="ai-card-name">AI Demand Forecasting</div>
+        <div class="ai-card-desc">Seasonal and regional demand prediction to pre-empt stockouts.</div>
+      </div>
+      <div class="ai-card">
+        <div class="ai-card-name">AI Inventory Forecasting</div>
+        <div class="ai-card-desc">Calculates optimal stock levels to minimise holding cost and prevent stockouts.</div>
+      </div>
+      <div class="ai-card">
+        <div class="ai-card-name">AI Expiry Prediction</div>
+        <div class="ai-card-desc">Estimates probability that a batch will expire before it is sold, so action can be taken early.</div>
+      </div>
+      <div class="ai-card">
+        <div class="ai-card-name">AI Dead Stock Prediction</div>
+        <div class="ai-card-desc">Flags medicines likely to become dead stock before 180-day threshold is reached.</div>
+      </div>
+      <div class="ai-card">
+        <div class="ai-card-name">AI Reorder Prediction</div>
+        <div class="ai-card-desc">Suggests optimal reorder quantity and timing per medicine.</div>
+      </div>
+      <div class="ai-card">
+        <div class="ai-card-name">AI Generic Substitute</div>
+        <div class="ai-card-desc">Recommends bioequivalent generics at lower cost when a brand is out of stock or expensive.</div>
+      </div>
+      <div class="ai-card">
+        <div class="ai-card-name">AI Chatbot</div>
+        <div class="ai-card-desc">Answers FAQs, guides billing flow, and responds to stock queries in natural language.</div>
+      </div>
+      <div class="ai-card">
+        <div class="ai-card-name">AI Voice Assistant</div>
+        <div class="ai-card-desc">Voice-controlled billing, medicine search, and purchase entry in English, Hindi, and Marathi.</div>
+      </div>
+      <div class="ai-card">
+        <div class="ai-card-name">AI Supplier Analysis</div>
+        <div class="ai-card-desc">Compares suppliers on price, delivery reliability, and quality history.</div>
+      </div>
+      <div class="ai-card">
+        <div class="ai-card-name">AI Duplicate Invoice Detection</div>
+        <div class="ai-card-desc">Prevents the same purchase invoice from being entered twice, even with OCR variation.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TECH -->
+  <section id="tech">
+    <div class="section-header">
+      <h2>Technical Architecture</h2>
+      <span class="section-tag">Stack & Integrations</span>
+    </div>
+    <div class="stack-grid">
+      <div class="stack-card"><div class="stack-layer">Frontend</div><div class="stack-value">HTML5, CSS3, Bootstrap 5, JavaScript (jQuery)</div></div>
+      <div class="stack-card"><div class="stack-layer">Backend</div><div class="stack-value">Java 11, Servlet API, JSP, JDBC</div></div>
+      <div class="stack-card"><div class="stack-layer">Database</div><div class="stack-value">MySQL 8.0 / MariaDB</div></div>
+      <div class="stack-card"><div class="stack-layer">Server</div><div class="stack-value">Apache Tomcat 10</div></div>
+      <div class="stack-card"><div class="stack-layer">Deployment</div><div class="stack-value">AWS EC2 + Docker (Ubuntu)</div></div>
+      <div class="stack-card"><div class="stack-layer">OCR Engine</div><div class="stack-value">Tesseract + custom-trained pharmacy model</div></div>
+      <div class="stack-card"><div class="stack-layer">AI Services</div><div class="stack-value">Python microservices (Flask) or Java ML libs</div></div>
+      <div class="stack-card"><div class="stack-layer">File Storage</div><div class="stack-value">AWS S3 (active) + S3 Glacier (archive)</div></div>
+      <div class="stack-card"><div class="stack-layer">Payment</div><div class="stack-value">Razorpay / PayU / Cashfree</div></div>
+      <div class="stack-card"><div class="stack-layer">SMS</div><div class="stack-value">Twilio</div></div>
+      <div class="stack-card"><div class="stack-layer">Messaging</div><div class="stack-value">WhatsApp Business API (Meta)</div></div>
+      <div class="stack-card"><div class="stack-layer">Health Records</div><div class="stack-value">ABDM API (ABHA integration)</div></div>
+    </div>
+
+    <div class="sub-head mt-20">Non-Functional Requirements</div>
+    <div class="nfr-grid">
+      <div class="nfr-card"><div class="nfr-cat">Performance</div><div class="nfr-val">Page load &lt;3 sec · Billing &lt;1 sec</div></div>
+      <div class="nfr-card"><div class="nfr-cat">Concurrency</div><div class="nfr-val">500+ simultaneous users</div></div>
+      <div class="nfr-card"><div class="nfr-cat">Availability</div><div class="nfr-val">99.9% uptime SLA</div></div>
+      <div class="nfr-card"><div class="nfr-cat">Scalability</div><div class="nfr-val">Multi-store · 1M+ medicine records</div></div>
+      <div class="nfr-card"><div class="nfr-cat">Security</div><div class="nfr-val">AES-256, SSL/TLS, RBAC, audit logs</div></div>
+      <div class="nfr-card"><div class="nfr-cat">Backup</div><div class="nfr-val">Daily incremental + weekly full + DR</div></div>
+      <div class="nfr-card"><div class="nfr-cat">Browsers</div><div class="nfr-val">Chrome, Firefox, Edge, Safari (latest)</div></div>
+      <div class="nfr-card"><div class="nfr-cat">Responsive</div><div class="nfr-val">Works on tablet and mobile browsers</div></div>
+    </div>
+  </section>
+
+  <!-- TIMELINE -->
+  <section id="timeline">
+    <div class="section-header">
+      <h2>Project Timeline</h2>
+      <span class="section-tag">22 Weeks · 7 Phases</span>
+    </div>
+    <div class="timeline">
+      <div class="timeline-item">
+        <div class="timeline-phase">Phase 1</div>
+        <div class="timeline-content">
+          <div class="timeline-title">Requirements Finalization</div>
+          <div class="timeline-meta">1 week · SRS sign-off</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-phase">Phase 2</div>
+        <div class="timeline-content">
+          <div class="timeline-title">Design – UI/UX & Database</div>
+          <div class="timeline-meta">2 weeks · Wireframes, mockups, schema design</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-phase">Phase 3</div>
+        <div class="timeline-content">
+          <div class="timeline-title">Core Modules (1–10)</div>
+          <div class="timeline-meta">6 weeks · Business, User, Medicine, Inventory, Supplier, Purchase, Billing, Prescription, Patient, Doctor</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-phase">Phase 4</div>
+        <div class="timeline-content">
+          <div class="timeline-title">Advanced Modules (11–20)</div>
+          <div class="timeline-meta">4 weeks · GST, Accounting, Returns, Drug Interaction, Compliance, Reports, Dashboard, Notifications</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-phase">Phase 5</div>
+        <div class="timeline-content">
+          <div class="timeline-title">Integrations & AI (21–28)</div>
+          <div class="timeline-meta">4 weeks · ABHA, E-Prescription, Loyalty, WhatsApp, Barcode, Security, AI features</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-phase">Phase 6</div>
+        <div class="timeline-content">
+          <div class="timeline-title">Testing & QA</div>
+          <div class="timeline-meta">3 weeks · Unit, integration, UAT, performance testing</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-phase">Phase 7</div>
+        <div class="timeline-content">
+          <div class="timeline-title">Deployment & Training</div>
+          <div class="timeline-meta">2 weeks · Go-live, user training, documentation handover</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SIGN-OFF -->
+  <section id="signoff">
+    <div class="section-header">
+      <h2>Client Sign-Off</h2>
+      <span class="section-tag">Approval</span>
+    </div>
+    <div class="signoff-box">
+      <div class="signoff-title">Requirements Verification</div>
+      <p class="signoff-sub">I have reviewed the complete module specifications, field lists, and feature requirements above and confirm the following:</p>
+
+      <div class="checkbox-row">
+        <input type="checkbox" id="approve-full" />
+        <label for="approve-full">I approve the requirements as presented above and authorise the project to proceed to SRS finalization and database design.</label>
+      </div>
+      <div class="checkbox-row">
+        <input type="checkbox" id="approve-changes" />
+        <label for="approve-changes">I approve the requirements with the modifications noted below.</label>
+      </div>
+
+      <div class="signoff-fields">
+        <div class="signoff-field full">
+          <label>Changes / Modifications Requested</label>
+          <textarea placeholder="List any changes or additions here. Leave blank if approving as presented."></textarea>
+        </div>
+        <div class="signoff-field">
+          <label>Client Name</label>
+          <input type="text" placeholder="Full name" />
+        </div>
+        <div class="signoff-field">
+          <label>Designation</label>
+          <input type="text" placeholder="Title or role" />
+        </div>
+        <div class="signoff-field">
+          <label>Date</label>
+          <input type="date" value="2026-06-24" />
+        </div>
+        <div class="signoff-field">
+          <label>Signature (type full name to confirm)</label>
+          <input type="text" placeholder="Type your full name as signature" />
+        </div>
+      </div>
+      <button class="btn-primary" onclick="handleSignoff()">Submit Sign-off</button>
+    </div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <div class="footer-inner">
+    <span class="footer-brand">Medical Store Management System · v1.0</span>
+    <span class="footer-meta">Prepared by Saurabh B. Navatre · MCA Major Project · June 2026</span>
+  </div>
+</footer>
+
+<script>
+function toggleModule(id) {
+  const card = document.getElementById(id);
+  const head = card.querySelector('.module-card-head');
+  const isOpen = card.classList.toggle('open');
+  head.setAttribute('aria-expanded', isOpen);
+}
+
+function handleSignoff() {
+  const full = document.getElementById('approve-full').checked;
+  const changes = document.getElementById('approve-changes').checked;
+  if (!full && !changes) {
+    alert('Please select an approval option before submitting.');
+    return;
+  }
+  const btn = document.querySelector('.btn-primary');
+  btn.textContent = 'Sign-off recorded — thank you';
+  btn.disabled = true;
+  btn.style.opacity = '.6';
+  btn.style.cursor = 'default';
+}
+
+// Keyboard support already in onclick/onkeydown on heads
+</script>
+
+</body>
+</html>

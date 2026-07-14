@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h5 class="mb-0 fw-bold">Smart Assistant <span class="badge bg-secondary">Rule-based</span></h5>
+  <a href="{{ url_for('ai.index') }}" class="btn btn-sm btn-outline-secondary">← Back</a>
+</div>
+
+<div class="alert alert-info small">This is a rule-based assistant that matches keywords to real data (stock, sales, expiry, reorder) — not a general-purpose AI/LLM.</div>
+
+<div class="card" style="max-width:640px">
+  <div class="card-body">
+    <div id="chatLog" style="height:320px;overflow-y:auto" class="border rounded p-2 mb-3 bg-light"></div>
+    <form id="chatForm" class="d-flex gap-2">
+      <input type="text" id="chatInput" class="form-control form-control-sm" placeholder='Try: "low stock", "sales today", "stock of Paracetamol"' autocomplete="off">
+      <button class="btn btn-sm btn-accent">Ask</button>
+    </form>
+  </div>
+</div>
+
+<script>
+const chatLog = document.getElementById('chatLog');
+document.getElementById('chatForm').addEventListener('submit', (e) => {
+  e.preventDefault();
+  const input = document.getElementById('chatInput');
+  const question = input.value.trim();
+  if (!question) return;
+  appendMsg('You', question);
+  input.value = '';
+  fetch('/ai/chatbot/ask', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json', 'X-CSRFToken': document.querySelector('meta[name="csrf-token"]')?.content || ''},
+    body: JSON.stringify({question})
+  }).then(r => r.json()).then(data => appendMsg('Assistant', data.answer));
+});
+function appendMsg(who, text) {
+  const div = document.createElement('div');
+  div.className = 'mb-2';
+  div.innerHTML = `<strong>${who}:</strong> ${text}`;
+  chatLog.appendChild(div);
+  chatLog.scrollTop = chatLog.scrollHeight;
+}
+</script>
+{% endblock %}

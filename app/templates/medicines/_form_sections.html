@@ -1,0 +1,26 @@
+{# Shared form sections macro for create/edit #}
+{% macro render_field(field, extra_class='') %}
+<div class="mb-3">
+  {{ field.label(class='form-label fw-600') }}
+  {% if field.type == 'BooleanField' %}
+    <div class="form-check">
+      {{ field(class='form-check-input ' + extra_class) }}
+      <label class="form-check-label" for="{{ field.id }}">{{ field.label.text }}</label>
+    </div>
+  {% elif field.type == 'TextAreaField' %}
+    {{ field(class='form-control ' + extra_class, rows=3) }}
+  {% elif field.type == 'SelectField' %}
+    {{ field(class='form-select ' + extra_class) }}
+  {% else %}
+    {{ field(class='form-control ' + extra_class) }}
+  {% endif %}
+  {% if field.errors %}
+    {% for err in field.errors %}
+      <div class="invalid-feedback d-block">{{ err }}</div>
+    {% endfor %}
+  {% endif %}
+  {% if field.description %}
+    <div class="form-text text-muted">{{ field.description }}</div>
+  {% endif %}
+</div>
+{% endmacro %}

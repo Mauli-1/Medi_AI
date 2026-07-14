@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h5 class="mb-0 fw-bold">Two-Factor Authentication</h5>
+  <a href="{{ url_for('security.index') }}" class="btn btn-sm btn-outline-secondary">← Back</a>
+</div>
+
+{% if already_enabled %}
+<div class="card" style="max-width:480px">
+  <div class="card-body">
+    <p>2FA is already enabled on your account.</p>
+    <form method="post" action="{{ url_for('security.twofa_disable') }}">
+      <button class="btn btn-outline-danger btn-sm">Disable 2FA</button>
+    </form>
+  </div>
+</div>
+{% else %}
+<div class="card" style="max-width:480px">
+  <div class="card-body">
+    <p class="small text-muted">Scan this QR code with Google Authenticator, Authy, or any TOTP app.</p>
+    <img src="data:image/png;base64,{{ qr_b64 }}" alt="2FA QR Code" class="mb-3" style="max-width:220px">
+    <p class="small">Or enter manually: <code>{{ secret }}</code></p>
+    <form method="post">
+      <input type="hidden" name="secret" value="{{ secret }}">
+      <label class="form-label small fw-semibold">Enter the 6-digit code to confirm</label>
+      <input type="text" name="token" class="form-control mb-3" maxlength="6" required>
+      <button class="btn btn-accent">Enable 2FA</button>
+    </form>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

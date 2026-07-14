@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Invoice {{ sale.invoice_number }}{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between mb-3">
+  <h5>Invoice: <strong>{{ sale.invoice_number }}</strong></h5>
+  <div><button onclick="window.print()" class="btn btn-sm btn-outline-primary">Print</button>
+  <a href="{{ url_for('sales.invoice_pdf', sale_id=sale.id) }}" class="btn btn-sm btn-success ms-2">Download PDF</a></div>
+</div>
+<div id="printArea" class="card p-4">
+  <div class="row border-bottom pb-3 mb-3">
+    <div class="col-8">
+      <h4 style="color:var(--accent)">{{ sale.branch.business.name if sale.branch else '' }}</h4>
+      <div class="small text-muted">GST: {{ sale.branch.business.gst_number if sale.branch else '' }}</div>
+      <div class="small text-muted">Drug License: {{ sale.branch.business.drug_license_no if sale.branch else '' }}</div>
+    </div>
+    <div class="col-4 text-end">
+      <div class="fw-bold">TAX INVOICE</div>
+      <div class="small">Invoice No: {{ sale.invoice_number }}</div>
+      <div class="small">Date: {{ sale.invoice_date.strftime('%d-%m-%Y %H:%M') }}</div>
+    </div>
+  </div>
+  {% if sale.patient %}
+  <div class="row mb-3">
+    <div class="col-6">
+      <div class="small fw-semibold">Bill To:</div>
+      <div>{{ sale.patient.full_name }}</div>
+      <div class="small text-muted">{{ sale.patient.phone }}</div>
+    </div>
+  </div>
+  {% endif %}
+  <table class="table table-sm table-bordered">
+    <thead class="table-light">
+      <tr><th>#</th><th>Medicine</th><th>HSN</th><th>Batch</th><th>Expiry</th><th>Qty</th><th>Rate</th><th>Disc</th><th>GST%</th><th>Amount</th></tr>
+    </thead>
+    <tbody>
+      {% for item in sale.items %}
+      <tr>
+        <td>{{ loop.index }}</td>
+        <td>{{ item.medicine.name }}<div class="small text-muted">{{ item.medicine.generic_name }}</div></td>
+        <td class="small">{{ item.medicine.hsn_code }}</td>
+        <td class="small">{{ item.batch.batch_number if item.batch else '' }}</td>
+        <td class="small">{{ item.batch.expiry_date.strftime('%m/%Y') if item.batch else '' }}</td>
+        <td>{{ item.quantity }}</td>
+        <td>₹{{ "%.2f"|format(item.selling_rate) }}</td>
+        <td>{{ item.discount_pct }}%</td>
+        <td>{{ item.gst_rate }}%</td>
+        <td class="fw-semibold">₹{{ "%.2f"|format(item.total_amount) }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+    <tfoot>
+      <tr><td colspan="9" class="text-end">Subtotal</td><td>₹{{ "%.2f"|format(sale.subtotal) }}</td></tr>
+      <tr><td colspan="9" class="text-end">CGST</td><td>₹{{ "%.2f"|format(sale.cgst_amount) }}</td></tr>
+      <tr><td colspan="9" class="text-end">SGST</td><td>₹{{ "%.2f"|format(sale.sgst_amount) }}</td></tr>
+      <tr><td colspan="9" class="text-end fw-bold">Grand Total</td><td class="fw-bold" style="color:var(--accent)">₹{{ "%.2f"|format(sale.total_amount) }}</td></tr>
+    </tfoot>
+  </table>
+  <div class="row mt-4">
+    <div class="col-6 small text-muted">Payment Mode: {{ sale.payment_mode|upper }}</div>
+    <div class="col-6 text-end small">Authorised Signatory</div>
+  </div>
+</div>
+{% endblock %}

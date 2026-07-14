@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h5 class="mb-0 fw-bold">{{ title }}</h5>
+  <div class="d-flex gap-2">
+    <a href="{{ url_for('reports.export', report_key=report_key, **request.args) }}" class="btn btn-sm btn-outline-secondary">Export Excel</a>
+    <a href="{{ url_for('reports.index') }}" class="btn btn-sm btn-outline-secondary">← Back</a>
+  </div>
+</div>
+
+<div class="card mb-3">
+  <div class="card-body py-2">
+    <form method="get" class="d-flex gap-2 flex-wrap">
+      <input type="date" name="from" value="{{ from_date }}" class="form-control form-control-sm" style="max-width:160px">
+      <input type="date" name="to" value="{{ to_date }}" class="form-control form-control-sm" style="max-width:160px">
+      <input type="number" name="year" value="{{ year }}" class="form-control form-control-sm" style="max-width:100px" placeholder="Year">
+      <button class="btn btn-sm btn-outline-secondary">Apply</button>
+    </form>
+  </div>
+</div>
+
+<div class="card">
+  <div class="table-responsive">
+    <table class="table table-sm table-hover mb-0">
+      <thead class="table-light">
+        <tr>{% for c in columns %}<th>{{ c.replace('_', ' ')|title }}</th>{% endfor %}</tr>
+      </thead>
+      <tbody>
+        {% for row in rows %}
+        <tr>
+          {% for c in columns %}
+          <td>{{ row[c] if row[c] is not none else '—' }}</td>
+          {% endfor %}
+        </tr>
+        {% else %}
+        <tr><td colspan="{{ columns|length }}" class="text-center text-muted py-4">No data found.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<h5 class="mb-4 fw-bold">Reports</h5>
+
+{% for category, reports in catalog.items() %}
+<div class="card mb-3">
+  <div class="card-body">
+    <h6 class="fw-bold mb-3">{{ category.replace('_', ' ')|title }}</h6>
+    <div class="list-group">
+      {% for key, name in reports %}
+      <a href="{{ url_for('reports.view', report_key=key) }}" class="list-group-item list-group-item-action d-flex justify-content-between">
+        <span>{{ name }}</span><span class="text-muted small">→</span>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endfor %}
+{% endblock %}

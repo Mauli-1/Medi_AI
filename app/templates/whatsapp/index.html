@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h5 class="mb-0 fw-bold">WhatsApp Communication</h5>
+  <a href="{{ url_for('whatsapp.logs') }}" class="btn btn-sm btn-outline-secondary">View All Logs</a>
+</div>
+
+{% if demo_mode %}
+<div class="alert alert-warning small">⚠ Demo Mode — Twilio not installed / configured. Messages are logged but not actually sent.</div>
+{% endif %}
+
+<div class="card mb-3">
+  <div class="card-body">
+    <h6 class="fw-bold mb-3">Send Payment Reminder</h6>
+    <form method="post" action="" id="reminderForm" class="d-flex gap-2">
+      <select id="reminderPatient" class="form-select form-select-sm" style="max-width:320px">
+        <option value="">Select patient...</option>
+        {% for p in patients %}<option value="{{ p.id }}">{{ p.full_name }} — {{ p.phone or 'no phone' }}</option>{% endfor %}
+      </select>
+      <button type="button" class="btn btn-sm btn-accent" onclick="sendReminder()">Send</button>
+    </form>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-body">
+    <h6 class="fw-bold mb-3">Recent Messages</h6>
+    <table class="table table-sm mb-0">
+      <thead class="table-light"><tr><th>To</th><th>Type</th><th>Status</th><th>Sent</th></tr></thead>
+      <tbody>
+        {% for l in logs %}
+        <tr>
+          <td class="small">{{ l.to_number }}</td>
+          <td><span class="badge bg-light text-dark border">{{ l.message_type }}</span></td>
+          <td><span class="badge {% if l.status=='sent' %}bg-success{% elif l.status=='failed' %}bg-danger{% else %}bg-secondary{% endif %}">{{ l.status }}</span></td>
+          <td class="small text-muted">{{ l.created_at.strftime('%d-%m-%Y %H:%M') if l.created_at else '' }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="4" class="text-center text-muted py-4">No messages sent yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+function sendReminder() {
+  const pid = document.getElementById('reminderPatient').value;
+  if (!pid) { alert('Select a patient.'); return; }
+  const form = document.createElement('form');
+  form.method = 'post';
+  form.action = `/whatsapp/send-payment-reminder/${pid}`;
+  document.body.appendChild(form);
+  form.submit();
+}
+</script>
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h5 class="mb-0 fw-bold">Verify ABHA — {{ patient.full_name }}</h5>
+  <a href="{{ url_for('abha.index') }}" class="btn btn-sm btn-outline-secondary">← Back</a>
+</div>
+
+<div class="alert alert-info small">Demo/Sandbox mode: this checks the ABHA ID format only (14 digits) and does not call the live ABDM API.</div>
+
+<div class="card" style="max-width:480px">
+  <div class="card-body">
+    <form method="post">
+      <label class="form-label small fw-semibold">ABHA ID</label>
+      <input type="text" name="abha_id" class="form-control mb-3" placeholder="12-3456-7890-1234" value="{{ patient.abha_id or '' }}" required>
+      <button class="btn btn-accent">Verify &amp; Link</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+
+{% block title %}Non-Moving Stock{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <h4 class="mb-0 fw-700">Non-Moving Stock</h4>
+    <small class="text-muted">Medicines with no inventory movement in the selected period</small>
+  </div>
+  <a href="{{ url_for('inventory.stock') }}" class="btn btn-sm btn-outline-secondary">
+    Back to Stock
+  </a>
+</div>
+
+<!-- Filters -->
+<div class="card mb-3">
+  <div class="card-body py-2">
+    <form method="get" class="row g-2 align-items-end">
+      <div class="col-md-3">
+        <label class="form-label form-label-sm mb-1">Days Idle (threshold)</label>
+        <select name="days" class="form-select form-select-sm">
+          {% for d in [30, 60, 90, 120, 180, 365] %}
+            <option value="{{ d }}" {% if days == d %}selected{% endif %}>{{ d }} days</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-3">
+        <label class="form-label form-label-sm mb-1">Branch</label>
+        <select name="branch_id" class="form-select form-select-sm">
+          <option value="0">All Branches</option>
+          {% for br in branches %}
+            <option value="{{ br.id }}" {% if branch_id == br.id %}selected{% endif %}>{{ br.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-2">
+        <button type="submit" class="btn btn-sm btn-primary mt-3">Apply</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Summary -->
+{% set total_value = results | sum(attribute='stock_value') %}
+<div class="row g-3 mb-3">
+  <div class="col-sm-4">
+    <div class="card text-center">
+      <div class="card-body py-2">
+        <div class="fs-4 fw-700 text-warning">{{ results|length }}</div>
+        <div class="small text-muted">Non-Moving SKUs (> {{ days }} days)</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-4">
+    <div class="card text-center">
+      <div class="card-body py-2">
+        <div class="fs-4 fw-700 text-danger">Rs. {{ '{:,.0f}'.format(total_value) }}</div>
+        <div class="small text-muted">Locked Inventory Value</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-4">
+    <div class="card text-center">
+      <div class="card-body py-2">
+        <div class="fs-4 fw-700 text-secondary">{{ results | sum(attribute='current_qty') }}</div>
+        <div class="small text-muted">Total Units Idle</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>Code</th>
+            <th>Medicine</th>
+            <th>Generic</th>
+            <th>Schedule</th>
+            <th class="text-center">Current Qty</th>
+            <th class="text-center">Last Movement</th>
+            <th class="text-center">Days Idle</th>
+            <th class="text-end">Stock Value (Rs.)</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in results %}
+          <tr>
+            <td><code>{{ row.medicine.medicine_code }}</code></td>
+            <td>
+              <a href="{{ url_for('medicines.detail', medicine_id=row.medicine.id) }}"
+                 class="fw-600 text-decoration-none">{{ row.medicine.name }}</a>
+            </td>
+            <td class="text-muted small">{{ row.medicine.generic_name or '—' }}</td>
+            <td>
+              <span class="badge bg-secondary">{{ row.medicine.schedule_type }}</span>
+            </td>
+            <td class="text-center">{{ row.current_qty }}</td>
+            <td class="text-center">{{ row.last_update.strftime('%d %b %Y') if row.last_update else '—' }}</td>
+            <td class="text-center">
+              <span class="badge {% if row.days_idle >= 180 %}bg-danger{% elif row.days_idle >= 90 %}bg-warning text-dark{% else %}bg-secondary{% endif %}">
+                {{ row.days_idle }} days
+              </span>
+            </td>
+            <td class="text-end">{{ '{:,.2f}'.format(row.stock_value) }}</td>
+            <td>
+              <a href="{{ url_for('inventory.adjust') }}?medicine_id={{ row.medicine.id }}"
+                 class="btn btn-xs btn-outline-secondary" style="font-size:.75rem;padding:.15rem .4rem;">
+                Adjust
+              </a>
+            </td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="9" class="text-center text-muted py-4">
+              No non-moving stock found for the selected period.
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

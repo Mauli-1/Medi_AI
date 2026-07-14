@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+
+{% block title %}Expiry Alerts{% endblock %}
+
+{% block extra_css %}
+<style>
+.urgency-card-7  { border-left: 4px solid #B71C1C; }
+.urgency-card-15 { border-left: 4px solid #E65100; }
+.urgency-card-30 { border-left: 4px solid #F9A825; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <h4 class="mb-0 fw-700">Expiry Alerts</h4>
+    <small class="text-muted">Batches expiring within the selected window</small>
+  </div>
+  <a href="{{ url_for('inventory.stock') }}" class="btn btn-sm btn-outline-secondary">Back to Stock</a>
+</div>
+
+<!-- Filters -->
+<div class="card mb-3">
+  <div class="card-body py-2">
+    <form method="get" class="row g-2 align-items-end">
+      <div class="col-md-3">
+        <label class="form-label form-label-sm mb-1">Expiry Window</label>
+        <select name="days" class="form-select form-select-sm">
+          {% for d in [7, 15, 30, 60, 90] %}
+            <option value="{{ d }}" {% if days == d %}selected{% endif %}>Within {{ d }} days</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-3">
+        <label class="form-label form-label-sm mb-1">Branch</label>
+        <select name="branch_id" class="form-select form-select-sm">
+          <option value="0">All Branches</option>
+          {% for br in branches %}
+            <option value="{{ br.id }}" {% if branch_id == br.id %}selected{% endif %}>{{ br.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-2">
+        <button type="submit" class="btn btn-sm btn-primary mt-3">Apply</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Summary -->
+<div class="row g-3 mb-3">
+  <div class="col-sm-4">
+    <div class="card text-center urgency-card-7">
+      <div class="card-body py-2">
+        <div class="fs-4 fw-700 text-danger">{{ urgent_7|length }}</div>
+        <div class="small text-muted">Expiring in 7 days</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-4">
+    <div class="card text-center urgency-card-15">
+      <div class="card-body py-2">
+        <div class="fs-4 fw-700" style="color:#E65100;">{{ urgent_15|length }}</div>
+        <div class="small text-muted">Expiring in 8–15 days</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-4">
+    <div class="card text-center urgency-card-30">
+      <div class="card-body py-2">
+        <div class="fs-4 fw-700" style="color:#F9A825;">{{ urgent_30|length }}</div>
+        <div class="small text-muted">Expiring in 16–30 days</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% macro batch_table(batches, header, header_class) %}
+{% if batches %}
+<div class="card mb-3 {{ '' }}">
+  <div class="card-header fw-600 {{ header_class }}">{{ header }} ({{ batches|length }} batches)</div>
+  <div class="table-responsive">
+    <table class="table table-sm mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>Medicine</th>
+          <th>Generic</th>
+          <th>Batch No.</th>
+          <th class="text-center">Qty Available</th>
+          <th class="text-center">Expiry Date</th>
+          <th class="text-center">Days Left</th>
+          <th>Branch</th>
+          <th class="text-end">MRP</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for b in batches %}
+        {% set d = b.days_to_expiry() %}
+        <tr>
+          <td>
+            <a href="{{ url_for('medicines.detail', medicine_id=b.medicine_id) }}"
+               class="fw-600 text-decoration-none">{{ b.medicine.name }}</a>
+          </td>
+          <td class="text-muted small">{{ b.medicine.generic_name or '—' }}</td>
+          <td><code>{{ b.batch_number }}</code></td>
+          <td class="text-center">{{ b.available_qty }}</td>
+          <td class="text-center">{{ b.expiry_date.strftime('%d %b %Y') if b.expiry_date else '—' }}</td>
+          <td class="text-center">
+            <span class="badge {% if d is not none and d <= 7 %}bg-danger{% elif d is not none and d <= 15 %}bg-warning text-dark{% else %}bg-info text-dark{% endif %}">
+              {{ d if d is not none else '—' }} days
+            </span>
+          </td>
+          <td>{{ b.branch.name if b.branch else '—' }}</td>
+          <td class="text-end">{{ '%.2f'|format(b.mrp|float) }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endif %}
+{% endmacro %}
+
+{{ batch_table(urgent_7,  'CRITICAL — Expiring within 7 Days',  'bg-danger text-white') }}
+{{ batch_table(urgent_15, 'WARNING — Expiring in 8–15 Days',     'text-white' ) }}
+{{ batch_table(urgent_30, 'NOTICE — Expiring in 16–30 Days',     '') }}
+
+{% if not urgent_7 and not urgent_15 and not urgent_30 %}
+<div class="card">
+  <div class="card-body text-center text-success py-5">
+    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" viewBox="0 0 16 16" class="mb-3">
+      <path d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2zm10.03 4.97a.75.75 0 0 1 .011 1.05l-3.992 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.75.75 0 0 1 1.08-.022z"/>
+    </svg>
+    <h5>No expiry alerts for the next {{ days }} days.</h5>
+    <p class="text-muted">All your inventory is well within expiry dates.</p>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h5 class="mb-0 fw-bold">Day Book</h5>
+  <div class="d-flex gap-2">
+    <form method="get" class="d-flex gap-2">
+      <input type="date" name="date" value="{{ day }}" class="form-control form-control-sm">
+      <button class="btn btn-sm btn-outline-secondary">Go</button>
+    </form>
+    <a href="{{ url_for('accounting.index') }}" class="btn btn-sm btn-outline-secondary">← Back</a>
+  </div>
+</div>
+
+{% for entry in entries %}
+<div class="card mb-2">
+  <div class="card-body">
+    <div class="d-flex justify-content-between">
+      <strong>{{ entry.entry_number }}</strong>
+      <span class="text-muted small">{{ entry.narration or '' }}</span>
+    </div>
+    <table class="table table-sm mb-0 mt-2">
+      <thead class="table-light"><tr><th>Account</th><th class="text-end">Debit</th><th class="text-end">Credit</th></tr></thead>
+      <tbody>
+        {% for line in entry.lines %}
+        <tr>
+          <td>{{ line.account.code }} — {{ line.account.name }}</td>
+          <td class="text-end">{{ '₹{:,.2f}'.format(line.debit) if line.debit else '' }}</td>
+          <td class="text-end">{{ '₹{:,.2f}'.format(line.credit) if line.credit else '' }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% else %}
+<div class="card"><div class="card-body text-center text-muted py-4">No journal entries for {{ day }}.</div></div>
+{% endfor %}
+{% endblock %}

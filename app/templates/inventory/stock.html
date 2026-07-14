@@ -1,0 +1,167 @@
+{% extends 'base.html' %}
+
+{% block title %}Stock Overview{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <h4 class="mb-0 fw-700">Stock Overview</h4>
+    <small class="text-muted">Current inventory levels across all branches</small>
+  </div>
+  <div class="d-flex gap-2">
+    <a href="{{ url_for('inventory.low_stock') }}" class="btn btn-sm btn-outline-danger">Low Stock</a>
+    <a href="{{ url_for('inventory.expiry_alert') }}" class="btn btn-sm btn-outline-warning">Expiry Alerts</a>
+    <a href="{{ url_for('inventory.adjust') }}" class="btn btn-sm btn-outline-secondary">Adjust Stock</a>
+    <a href="{{ url_for('inventory.transfer') }}" class="btn btn-sm btn-outline-primary">Transfer</a>
+  </div>
+</div>
+
+<!-- Filters -->
+<div class="card mb-3">
+  <div class="card-body py-2">
+    <form method="get" class="row g-2 align-items-end">
+      <div class="col-md-4">
+        <input type="text" name="q" value="{{ q }}" class="form-control form-control-sm"
+               placeholder="Search medicine name…"/>
+      </div>
+      <div class="col-md-2">
+        <select name="category_id" class="form-select form-select-sm">
+          <option value="0">All Categories</option>
+          {% for cat in categories %}
+            <option value="{{ cat.id }}" {% if category_id == cat.id %}selected{% endif %}>{{ cat.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-2">
+        <select name="branch_id" class="form-select form-select-sm">
+          <option value="0">All Branches</option>
+          {% for br in branches %}
+            <option value="{{ br.id }}" {% if branch_id == br.id %}selected{% endif %}>{{ br.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-2 d-flex gap-1">
+        <button type="submit" class="btn btn-sm btn-primary">Filter</button>
+        <a href="{{ url_for('inventory.stock') }}" class="btn btn-sm btn-outline-secondary">Clear</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Summary cards -->
+{% set low_count = stock_data | selectattr('is_low') | list | length %}
+{% set total_value = stock_data | sum(attribute='value') %}
+<div class="row g-3 mb-3">
+  <div class="col-sm-4">
+    <div class="card text-center">
+      <div class="card-body py-2">
+        <div class="fs-4 fw-700 text-primary">{{ stock_data|length }}</div>
+        <div class="small text-muted">Total SKUs</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-4">
+    <div class="card text-center">
+      <div class="card-body py-2">
+        <div class="fs-4 fw-700 text-danger">{{ low_count }}</div>
+        <div class="small text-muted">Low Stock Items</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-4">
+    <div class="card text-center">
+      <div class="card-body py-2">
+        <div class="fs-4 fw-700 text-success">Rs. {{ '{:,.0f}'.format(total_value) }}</div>
+        <div class="small text-muted">Inventory Value (Purchase)</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Table -->
+<div class="card">
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>Code</th>
+            <th>Medicine</th>
+            <th>Generic</th>
+            <th>Schedule</th>
+            <th class="text-center">Reorder Level</th>
+            <th class="text-center">Current Stock</th>
+            <th class="text-end">Stock Value</th>
+            <th class="text-center">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in stock_data %}
+          <tr class="{{ 'table-danger' if row.is_low else '' }}">
+            <td><code>{{ row.medicine.medicine_code }}</code></td>
+            <td>
+              <a href="{{ url_for('medicines.detail', medicine_id=row.medicine.id) }}"
+                 class="fw-600 text-decoration-none">{{ row.medicine.name }}</a>
+            </td>
+            <td class="text-muted small">{{ row.medicine.generic_name or '—' }}</td>
+            <td>
+              <span class="badge"
+                    style="background:{% if row.medicine.schedule_type=='H' %}#FF8C00{% elif row.medicine.schedule_type=='H1' %}#D32F2F{% elif row.medicine.schedule_type=='X' %}#6A1A1A{% elif row.medicine.schedule_type=='G' %}#1565C0{% elif row.medicine.schedule_type=='OTC' %}#2E7D32{% else %}#6A1A6A{% endif %};color:#fff;font-size:.7rem;">
+                {{ row.medicine.schedule_type }}
+              </span>
+            </td>
+            <td class="text-center">{{ row.medicine.reorder_level }}</td>
+            <td class="text-center fw-600 {% if row.is_low %}text-danger{% else %}text-success{% endif %}">
+              {{ row.qty }}
+              {% if row.is_low %}
+                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="#D32F2F" viewBox="0 0 16 16">
+                  <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+                </svg>
+              {% endif %}
+            </td>
+            <td class="text-end small">Rs. {{ '{:,.2f}'.format(row.value) }}</td>
+            <td class="text-center">
+              {% if row.is_low %}
+                <span class="badge bg-danger">Low</span>
+              {% elif row.qty == 0 %}
+                <span class="badge bg-secondary">Out of Stock</span>
+              {% else %}
+                <span class="badge bg-success">In Stock</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="8" class="text-center text-muted py-4">No stock records found.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {% if pagination.pages > 1 %}
+  <div class="card-footer d-flex justify-content-between align-items-center">
+    <small class="text-muted">Showing {{ pagination.first }}–{{ pagination.last }} of {{ pagination.total }}</small>
+    <nav>
+      <ul class="pagination pagination-sm mb-0">
+        <li class="page-item {% if not pagination.has_prev %}disabled{% endif %}">
+          <a class="page-link" href="{{ url_for('inventory.stock', page=pagination.prev_num, q=q, category_id=category_id, branch_id=branch_id) }}">Prev</a>
+        </li>
+        {% for p in pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+          {% if p %}
+            <li class="page-item {% if p == pagination.page %}active{% endif %}">
+              <a class="page-link" href="{{ url_for('inventory.stock', page=p, q=q, category_id=category_id, branch_id=branch_id) }}">{{ p }}</a>
+            </li>
+          {% else %}
+            <li class="page-item disabled"><span class="page-link">…</span></li>
+          {% endif %}
+        {% endfor %}
+        <li class="page-item {% if not pagination.has_next %}disabled{% endif %}">
+          <a class="page-link" href="{{ url_for('inventory.stock', page=pagination.next_num, q=q, category_id=category_id, branch_id=branch_id) }}">Next</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

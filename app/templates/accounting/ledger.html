@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h5 class="mb-0 fw-bold">Ledger — {{ account.code }} {{ account.name }}</h5>
+  </div>
+  <a href="{{ url_for('accounting.chart_of_accounts') }}" class="btn btn-sm btn-outline-secondary">← Back</a>
+</div>
+<div class="card">
+  <div class="table-responsive">
+    <table class="table table-sm table-hover mb-0">
+      <thead class="table-light"><tr><th>Date</th><th>Entry No</th><th>Narration</th><th class="text-end">Debit</th><th class="text-end">Credit</th><th class="text-end">Balance</th></tr></thead>
+      <tbody>
+        {% for r in rows %}
+        <tr>
+          <td class="small">{{ r.date.strftime('%d-%m-%Y') }}</td>
+          <td class="fw-semibold">{{ r.entry_number }}</td>
+          <td class="small text-muted">{{ r.narration or '' }}</td>
+          <td class="text-end">{{ '₹{:,.2f}'.format(r.debit) if r.debit else '' }}</td>
+          <td class="text-end">{{ '₹{:,.2f}'.format(r.credit) if r.credit else '' }}</td>
+          <td class="text-end fw-semibold">₹{{ '{:,.2f}'.format(r.balance) }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="6" class="text-center text-muted py-4">No transactions on this account.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

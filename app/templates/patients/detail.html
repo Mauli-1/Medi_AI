@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h5 class="mb-0 fw-bold">{{ patient.full_name }} <span class="badge bg-light text-dark border">{{ patient.patient_code }}</span></h5>
+    <p class="text-muted mb-0 small">{{ patient.phone or '' }} {% if patient.email %}· {{ patient.email }}{% endif %}</p>
+  </div>
+  <div class="d-flex gap-2">
+    <a href="{{ url_for('loyalty.patient_history', patient_id=patient.id) }}" class="btn btn-sm btn-outline-secondary">Loyalty History</a>
+    <a href="{{ url_for('patients.edit', patient_id=patient.id) }}" class="btn btn-sm btn-outline-primary">Edit</a>
+    <a href="{{ url_for('patients.index') }}" class="btn btn-sm btn-outline-secondary">← Back</a>
+  </div>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-3">
+    <div class="card h-100"><div class="card-body">
+      <div class="text-muted small">Loyalty Points</div>
+      <div class="fs-5 fw-bold">{{ patient.loyalty_points or 0 }}</div>
+    </div></div>
+  </div>
+  <div class="col-md-3">
+    <div class="card h-100"><div class="card-body">
+      <div class="text-muted small">Tier</div>
+      <div class="fs-5 fw-bold">{{ (patient.loyalty_tier or 'silver')|capitalize }}</div>
+    </div></div>
+  </div>
+  <div class="col-md-3">
+    <div class="card h-100"><div class="card-body">
+      <div class="text-muted small">Total Purchases</div>
+      <div class="fs-5 fw-bold">₹{{ '{:,.2f}'.format(patient.total_purchases or 0) }}</div>
+    </div></div>
+  </div>
+  <div class="col-md-3">
+    <div class="card h-100"><div class="card-body">
+      <div class="text-muted small">Blood Group</div>
+      <div class="fs-5 fw-bold">{{ patient.blood_group or '—' }}</div>
+    </div></div>
+  </div>
+</div>
+
+{% if patient.allergies or patient.chronic_conditions %}
+<div class="alert alert-warning small">
+  {% if patient.allergies %}<strong>Allergies:</strong> {{ patient.allergies }}<br>{% endif %}
+  {% if patient.chronic_conditions %}<strong>Chronic Conditions:</strong> {{ patient.chronic_conditions }}{% endif %}
+</div>
+{% endif %}
+
+<div class="row g-3">
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-body">
+        <h6 class="fw-bold mb-3">Purchase History</h6>
+        <table class="table table-sm mb-0">
+          <thead class="table-light"><tr><th>Invoice</th><th>Date</th><th class="text-end">Amount</th></tr></thead>
+          <tbody>
+            {% for s in sales %}
+            <tr>
+              <td><a href="{{ url_for('sales.invoice', sale_id=s.id) }}">{{ s.invoice_number }}</a></td>
+              <td class="small">{{ s.invoice_date.strftime('%d-%m-%Y') if s.invoice_date else '' }}</td>
+              <td class="text-end">₹{{ '{:,.2f}'.format(s.total_amount) }}</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="3" class="text-center text-muted py-3">No purchases yet.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-body">
+        <h6 class="fw-bold mb-3">Prescription History</h6>
+        <table class="table table-sm mb-0">
+          <thead class="table-light"><tr><th>Code</th><th>Date</th><th>Status</th></tr></thead>
+          <tbody>
+            {% for rx in prescriptions %}
+            <tr>
+              <td>{{ rx.prescription_code }}</td>
+              <td class="small">{{ rx.rx_date.strftime('%d-%m-%Y') if rx.rx_date else '' }}</td>
+              <td><span class="badge bg-light text-dark border">{{ rx.status|capitalize }}</span></td>
+            </tr>
+            {% else %}
+            <tr><td colspan="3" class="text-center text-muted py-3">No prescriptions yet.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

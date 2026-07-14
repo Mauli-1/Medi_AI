@@ -1,0 +1,36 @@
+{% extends "auth/auth_base.html" %}
+
+{% block auth_title %}Two-Step Verification{% endblock %}
+{% block auth_subtitle %}Enter the code from your authenticator app{% endblock %}
+
+{% block auth_body %}
+<form method="POST" action="{{ url_for('auth.two_factor') }}" novalidate autocomplete="off">
+  {{ form.hidden_tag() }}
+
+  <div class="mb-4">
+    <label for="token" class="form-label fw-semibold text-muted small text-uppercase ls-wide">
+      Authenticator Code
+    </label>
+    {{ form.token(class="form-control form-control-lg auth-input text-center fw-bold" +
+       (" is-invalid" if form.token.errors else ""),
+       id="token", placeholder="000 000", maxlength=8,
+       inputmode="numeric", pattern="[0-9]*", autofocus=true) }}
+    {% for error in form.token.errors %}
+      <div class="invalid-feedback">{{ error }}</div>
+    {% endfor %}
+    <div class="form-text text-muted mt-2">
+      Open your authenticator app and enter the 6-digit code shown for this account.
+    </div>
+  </div>
+
+  <button type="submit" class="btn btn-accent btn-lg w-100 fw-semibold mb-3">
+    Verify &amp; Sign In
+  </button>
+
+  <div class="text-center">
+    <a href="{{ url_for('auth.login') }}" class="text-muted small text-decoration-none">
+      &larr; Back to sign in
+    </a>
+  </div>
+</form>
+{% endblock %}

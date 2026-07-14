@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h5 class="mb-0 fw-bold">Prescriptions</h5>
+  <a href="{{ url_for('prescriptions.upload') }}" class="btn btn-sm btn-accent">+ Upload Prescription</a>
+</div>
+
+<div class="card mb-3">
+  <div class="card-body py-2">
+    <form method="get" class="d-flex gap-2">
+      <select name="status" class="form-select form-select-sm" style="max-width:180px">
+        <option value="">All Status</option>
+        {% for s in ['pending','verified','dispensed','expired'] %}
+        <option value="{{ s }}" {% if status==s %}selected{% endif %}>{{ s|capitalize }}</option>
+        {% endfor %}
+      </select>
+      <button class="btn btn-sm btn-outline-secondary">Filter</button>
+    </form>
+  </div>
+</div>
+
+<div class="card">
+  <div class="table-responsive">
+    <table class="table table-sm table-hover mb-0">
+      <thead class="table-light"><tr><th>Code</th><th>Patient</th><th>Doctor</th><th>Date</th><th>Status</th><th></th></tr></thead>
+      <tbody>
+        {% for rx in prescriptions %}
+        <tr>
+          <td><a href="{{ url_for('prescriptions.detail', rx_id=rx.id) }}" class="fw-semibold text-decoration-none">{{ rx.prescription_code }}</a></td>
+          <td>{{ rx.patient.full_name if rx.patient else '—' }}</td>
+          <td class="small">{{ rx.doctor.full_name if rx.doctor else '—' }}</td>
+          <td class="small">{{ rx.rx_date.strftime('%d-%m-%Y') if rx.rx_date else '' }}</td>
+          <td><span class="badge {% if rx.status=='verified' %}bg-success{% elif rx.status=='dispensed' %}bg-primary{% elif rx.status=='expired' %}bg-danger{% else %}bg-secondary{% endif %}">{{ rx.status|capitalize }}</span></td>
+          <td><a href="{{ url_for('prescriptions.detail', rx_id=rx.id) }}" class="btn btn-sm btn-outline-primary py-0 px-2">View</a></td>
+        </tr>
+        {% else %}
+        <tr><td colspan="6" class="text-center text-muted py-4">No prescriptions found.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

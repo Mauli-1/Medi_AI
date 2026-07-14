@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+{% block title %}Business Settings{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Business Settings</h1>
+    <p class="page-subtitle">Update your pharmacy profile and configuration</p>
+  </div>
+</div>
+
+<form method="POST" action="{{ url_for('business.edit') }}"
+      enctype="multipart/form-data" novalidate>
+  {{ form.hidden_tag() }}
+  <div class="row g-4">
+
+    <!-- Left column -->
+    <div class="col-12 col-lg-8">
+
+      <!-- Basic info -->
+      <div class="card mb-4">
+        <div class="card-header"><span class="card-title">Basic Information</span></div>
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-12">{% include "business/_field.html" with field=form.name %}</div>
+            <div class="col-md-8">{% include "business/_field.html" with field=form.legal_name %}</div>
+            <div class="col-md-4">{% include "business/_field.html" with field=form.short_name %}</div>
+            <div class="col-md-6">{% include "business/_field.html" with field=form.phone %}</div>
+            <div class="col-md-6">{% include "business/_field.html" with field=form.alt_phone %}</div>
+            <div class="col-md-8">{% include "business/_field.html" with field=form.email %}</div>
+            <div class="col-md-4">{% include "business/_field.html" with field=form.website %}</div>
+            <div class="col-12">{% include "business/_field.html" with field=form.tagline %}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Address -->
+      <div class="card mb-4">
+        <div class="card-header"><span class="card-title">Address</span></div>
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-12">{% include "business/_field.html" with field=form.address_line1 %}</div>
+            <div class="col-12">{% include "business/_field.html" with field=form.address_line2 %}</div>
+            <div class="col-md-5">{% include "business/_field.html" with field=form.city %}</div>
+            <div class="col-md-4">
+              <label class="form-label">{{ form.state.label.text }}</label>
+              {{ form.state(class="form-select" + (" is-invalid" if form.state.errors else "")) }}
+              {% for e in form.state.errors %}<div class="invalid-feedback">{{ e }}</div>{% endfor %}
+            </div>
+            <div class="col-md-3">{% include "business/_field.html" with field=form.pincode %}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Regulatory -->
+      <div class="card mb-4">
+        <div class="card-header"><span class="card-title">Regulatory &amp; Tax</span></div>
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-6">{% include "business/_field.html" with field=form.gstin %}</div>
+            <div class="col-md-6">{% include "business/_field.html" with field=form.pan %}</div>
+            <div class="col-md-6">{% include "business/_field.html" with field=form.drug_license_no %}</div>
+            <div class="col-md-6">{% include "business/_field.html" with field=form.drug_license_no2 %}</div>
+            <div class="col-md-6">{% include "business/_field.html" with field=form.fssai_no %}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Banking -->
+      <div class="card mb-4">
+        <div class="card-header"><span class="card-title">Banking Details</span></div>
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-6">{% include "business/_field.html" with field=form.bank_name %}</div>
+            <div class="col-md-6">{% include "business/_field.html" with field=form.bank_branch %}</div>
+            <div class="col-md-6">{% include "business/_field.html" with field=form.bank_account_no %}</div>
+            <div class="col-md-3">{% include "business/_field.html" with field=form.bank_ifsc %}</div>
+            <div class="col-md-3">{% include "business/_field.html" with field=form.upi_id %}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Invoice settings -->
+      <div class="card mb-4">
+        <div class="card-header"><span class="card-title">Invoice Settings</span></div>
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-3">{% include "business/_field.html" with field=form.invoice_prefix %}</div>
+            <div class="col-12">{% include "business/_field.html" with field=form.invoice_terms textarea=true %}</div>
+            <div class="col-12">{% include "business/_field.html" with field=form.invoice_footer textarea=true %}</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Right column -->
+    <div class="col-12 col-lg-4">
+
+      <!-- Logo -->
+      <div class="card mb-4">
+        <div class="card-header"><span class="card-title">Logo</span></div>
+        <div class="card-body text-center">
+          {% if business.logo_filename %}
+            <img src="{{ url_for('static', filename='uploads/' + business.logo_filename) }}"
+                 alt="Logo" style="max-height:80px;max-width:100%;object-fit:contain;margin-bottom:1rem;">
+          {% else %}
+            <div style="width:80px;height:80px;border-radius:16px;background:var(--accent-lt);
+                        display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="var(--accent)" viewBox="0 0 16 16">
+                <path d="M8 1a2.5 2.5 0 0 1 2.5 2.5V4h-5v-.5A2.5 2.5 0 0 1 8 1z"/>
+              </svg>
+            </div>
+          {% endif %}
+          {{ form.logo_file(class="form-control form-control-sm") }}
+        </div>
+      </div>
+
+      <!-- Features -->
+      <div class="card mb-4">
+        <div class="card-header"><span class="card-title">Features</span></div>
+        <div class="card-body">
+          {% for f in [form.enable_loyalty, form.enable_whatsapp, form.enable_abha,
+                       form.enable_eprescription, form.enable_barcode, form.enable_sms] %}
+          <div class="form-check mb-2" style="padding:.5rem .75rem;background:var(--ground);border-radius:8px;">
+            {{ f(class="form-check-input") }}
+            <label class="form-check-label" for="{{ f.id }}" style="font-size:.875rem;">
+              {{ f.label.text }}
+            </label>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Save -->
+      <div class="card">
+        <div class="card-body">
+          {{ form.submit(class="btn btn-primary w-100") }}
+        </div>
+      </div>
+
+    </div>
+  </div>
+</form>
+{% endblock %}

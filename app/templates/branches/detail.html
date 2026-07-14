@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h5 class="mb-0 fw-bold">{{ branch.name }} <span class="badge bg-light text-dark border">{{ branch.code }}</span></h5>
+    <p class="text-muted mb-0 small">{{ branch.address_line1 or '' }} {{ branch.city or '' }}</p>
+  </div>
+  <div class="d-flex gap-2">
+    <a href="{{ url_for('branches.edit', branch_id=branch.id) }}" class="btn btn-sm btn-outline-primary">Edit</a>
+    <a href="{{ url_for('branches.index') }}" class="btn btn-sm btn-outline-secondary">← Back</a>
+  </div>
+</div>
+
+<div class="row g-3">
+  <div class="col-md-4">
+    <div class="card h-100"><div class="card-body">
+      <div class="text-muted small">Staff</div>
+      <div class="fs-4 fw-bold">{{ staff_count }}</div>
+    </div></div>
+  </div>
+  <div class="col-md-4">
+    <div class="card h-100"><div class="card-body">
+      <div class="text-muted small">Total Sales (Count)</div>
+      <div class="fs-4 fw-bold">{{ sales_count }}</div>
+    </div></div>
+  </div>
+  <div class="col-md-4">
+    <div class="card h-100"><div class="card-body">
+      <div class="text-muted small">Total Sales (Value)</div>
+      <div class="fs-4 fw-bold">₹{{ '{:,.2f}'.format(total_sales) }}</div>
+    </div></div>
+  </div>
+</div>
+{% endblock %}

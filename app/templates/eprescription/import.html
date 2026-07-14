@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h5 class="mb-0 fw-bold">Import E-Prescription</h5>
+  <a href="{{ url_for('eprescription.index') }}" class="btn btn-sm btn-outline-secondary">← Back</a>
+</div>
+
+<div class="card" style="max-width:640px">
+  <div class="card-body">
+    <form method="post" enctype="multipart/form-data">
+      <label class="form-label small fw-semibold">Patient</label>
+      <select name="patient_id" class="form-select mb-3" required>
+        <option value="">Select patient...</option>
+        {% for p in patients %}<option value="{{ p.id }}">{{ p.full_name }}</option>{% endfor %}
+      </select>
+
+      <label class="form-label small fw-semibold">Upload File (.xml / .json / .pdf)</label>
+      <input type="file" name="file" class="form-control mb-3" accept=".xml,.json,.pdf">
+
+      <label class="form-label small fw-semibold">Or Paste E-Prescription Text (XML/JSON)</label>
+      <textarea name="raw_text" class="form-control mb-3" rows="8" placeholder='{"medicines": [{"name": "Paracetamol", "dosage": "500mg", "duration": "5 days", "quantity": 10}], "signature": "..."}'></textarea>
+
+      <button class="btn btn-accent">Import</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

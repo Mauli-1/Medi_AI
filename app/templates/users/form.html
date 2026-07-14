@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h5 class="mb-0 fw-bold">{{ title }}</h5>
+  <a href="{{ url_for('users.index') }}" class="btn btn-sm btn-outline-secondary">← Back</a>
+</div>
+
+<form method="post">
+  <div class="card mb-3">
+    <div class="card-body row g-3">
+      <div class="col-md-6">
+        <label class="form-label small">Full Name *</label>
+        <input type="text" name="full_name" class="form-control form-control-sm" value="{{ user.full_name if user else '' }}" required>
+      </div>
+      {% if not user %}
+      <div class="col-md-3">
+        <label class="form-label small">Username *</label>
+        <input type="text" name="username" class="form-control form-control-sm" required>
+      </div>
+      <div class="col-md-3">
+        <label class="form-label small">Email *</label>
+        <input type="email" name="email" class="form-control form-control-sm" required>
+      </div>
+      {% endif %}
+      <div class="col-md-3">
+        <label class="form-label small">Phone</label>
+        <input type="text" name="phone" class="form-control form-control-sm" value="{{ user.phone if user else '' }}">
+      </div>
+      <div class="col-md-3">
+        <label class="form-label small">Role</label>
+        <select name="role" class="form-select form-select-sm">
+          {% for r in roles %}<option value="{{ r }}" {% if user and user.role==r %}selected{% endif %}>{{ r|replace('_',' ')|capitalize }}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="col-md-3">
+        <label class="form-label small">Branch</label>
+        <select name="branch_id" class="form-select form-select-sm">
+          <option value="">-- None --</option>
+          {% for b in branches %}<option value="{{ b.id }}" {% if user and user.branch_id==b.id %}selected{% endif %}>{{ b.name }}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="col-md-3">
+        <label class="form-label small">Designation</label>
+        <input type="text" name="designation" class="form-control form-control-sm" value="{{ user.designation if user else '' }}">
+      </div>
+      <div class="col-md-6">
+        <label class="form-label small">{{ 'Set New Password' if user else 'Password' }}</label>
+        <input type="password" name="password" class="form-control form-control-sm" placeholder="{{ 'Leave blank to keep current' if user else 'Default: Changeme@123' }}">
+      </div>
+      {% if user %}
+      <div class="col-12">
+        <div class="form-check">
+          <input type="checkbox" name="is_active" class="form-check-input" id="isActive" {% if user.is_active %}checked{% endif %}>
+          <label class="form-check-label small" for="isActive">Active</label>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+  <button class="btn btn-accent">{{ 'Save Changes' if user else 'Add User' }}</button>
+</form>
+{% endblock %}

@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h5 class="mb-0 fw-bold">WhatsApp Logs</h5>
+  <a href="{{ url_for('whatsapp.index') }}" class="btn btn-sm btn-outline-secondary">← Back</a>
+</div>
+
+<div class="card mb-3">
+  <div class="card-body py-2">
+    <form method="get" class="d-flex gap-2">
+      <select name="type" class="form-select form-select-sm" style="max-width:200px">
+        <option value="">All Types</option>
+        {% for t in ['invoice','payment_reminder','prescription_reminder','refill_reminder','promotional'] %}
+        <option value="{{ t }}" {% if msg_type==t %}selected{% endif %}>{{ t }}</option>
+        {% endfor %}
+      </select>
+      <select name="status" class="form-select form-select-sm" style="max-width:150px">
+        <option value="">All Status</option>
+        {% for s in ['queued','sent','failed'] %}
+        <option value="{{ s }}" {% if status==s %}selected{% endif %}>{{ s }}</option>
+        {% endfor %}
+      </select>
+      <button class="btn btn-sm btn-outline-secondary">Filter</button>
+    </form>
+  </div>
+</div>
+
+<div class="card">
+  <div class="table-responsive">
+    <table class="table table-sm table-hover mb-0">
+      <thead class="table-light"><tr><th>To</th><th>Type</th><th>Status</th><th>Error</th><th>Sent</th></tr></thead>
+      <tbody>
+        {% for l in entries %}
+        <tr>
+          <td class="small">{{ l.to_number }}</td>
+          <td><span class="badge bg-light text-dark border">{{ l.message_type }}</span></td>
+          <td><span class="badge {% if l.status=='sent' %}bg-success{% elif l.status=='failed' %}bg-danger{% else %}bg-secondary{% endif %}">{{ l.status }}</span></td>
+          <td class="small text-muted">{{ l.error_message or '' }}</td>
+          <td class="small text-muted">{{ l.created_at.strftime('%d-%m-%Y %H:%M') if l.created_at else '' }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5" class="text-center text-muted py-4">No logs found.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

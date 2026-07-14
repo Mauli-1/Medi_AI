@@ -1,0 +1,10 @@
+{% extends "auth/auth_base.html" %}
+{% block auth_title %}404 — Page Not Found{% endblock %}
+{% block auth_subtitle %}The page you're looking for doesn't exist{% endblock %}
+{% block auth_body %}
+<div class="text-center py-3">
+  <div style="font-size:3rem;font-weight:700;color:var(--accent);letter-spacing:-.05em;">404</div>
+  <p class="text-muted mb-4">That URL doesn't match anything in this system. Check the address or return to the dashboard.</p>
+  <a href="/" class="btn btn-accent">Back to Dashboard</a>
+</div>
+{% endblock %}

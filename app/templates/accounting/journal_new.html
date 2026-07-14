@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h5 class="mb-0 fw-bold">New Journal Entry</h5>
+  <a href="{{ url_for('accounting.index') }}" class="btn btn-sm btn-outline-secondary">← Back</a>
+</div>
+
+<form method="post">
+  <div class="card mb-3">
+    <div class="card-body row g-3">
+      <div class="col-md-3">
+        <label class="form-label small">Date</label>
+        <input type="date" name="entry_date" class="form-control form-control-sm" value="{{ '' }}" required>
+      </div>
+      <div class="col-md-9">
+        <label class="form-label small">Narration</label>
+        <input type="text" name="narration" class="form-control form-control-sm" placeholder="Description of this entry">
+      </div>
+    </div>
+  </div>
+
+  <div class="card mb-3">
+    <div class="card-body">
+      <table class="table table-sm mb-2" id="linesTable">
+        <thead class="table-light"><tr><th>Account</th><th style="width:150px">Debit</th><th style="width:150px">Credit</th><th></th></tr></thead>
+        <tbody id="linesBody">
+          <tr>
+            <td>
+              <select name="account_id[]" class="form-select form-select-sm">
+                {% for a in accounts %}<option value="{{ a.id }}">{{ a.code }} — {{ a.name }}</option>{% endfor %}
+              </select>
+            </td>
+            <td><input type="number" step="0.01" name="debit[]" class="form-control form-control-sm"></td>
+            <td><input type="number" step="0.01" name="credit[]" class="form-control form-control-sm"></td>
+            <td><button type="button" class="btn btn-sm btn-outline-danger" onclick="this.closest('tr').remove()">✕</button></td>
+          </tr>
+        </tbody>
+      </table>
+      <button type="button" class="btn btn-sm btn-outline-secondary" onclick="addLine()">+ Add Line</button>
+    </div>
+  </div>
+
+  <button class="btn btn-accent">Save Journal Entry</button>
+</form>
+
+<script>
+function addLine() {
+  const tbody = document.getElementById('linesBody');
+  const row = tbody.rows[0].cloneNode(true);
+  row.querySelectorAll('input').forEach(i => i.value = '');
+  tbody.appendChild(row);
+}
+</script>
+{% endblock %}

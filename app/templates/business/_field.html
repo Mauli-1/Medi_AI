@@ -1,0 +1,12 @@
+{% set field_class = "form-control" + (" is-invalid" if field.errors else "") %}
+<div>
+  <label class="form-label" for="{{ field.id }}">{{ field.label.text }}</label>
+  {% if textarea is defined and textarea %}
+    {{ field(class=field_class, rows=3) }}
+  {% else %}
+    {{ field(class=field_class) }}
+  {% endif %}
+  {% for error in field.errors %}
+    <div class="invalid-feedback">{{ error }}</div>
+  {% endfor %}
+</div>

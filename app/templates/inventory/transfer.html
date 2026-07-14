@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+{% block title %}Stock Transfer{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <h4 class="mb-0 fw-700">Stock Transfer</h4>
+    <small class="text-muted">Move inventory between branches</small>
+  </div>
+  <a href="{{ url_for('inventory.stock') }}" class="btn btn-sm btn-outline-secondary">Back to Stock</a>
+</div>
+
+<div class="row justify-content-center">
+  <div class="col-lg-7">
+    <div class="card">
+      <div class="card-header fw-600">Transfer Details</div>
+      <div class="card-body">
+        <form method="post" action="{{ url_for('inventory.transfer') }}" id="transferForm" novalidate>
+          {{ form.hidden_tag() }}
+
+          <div class="row g-3">
+            <div class="col-md-6">
+              <div class="mb-3">
+                {{ form.from_branch_id.label(class='form-label fw-600') }}
+                {{ form.from_branch_id(class='form-select',
+                                       onchange='document.getElementById(\"transferForm\").submit()') }}
+                {% for err in form.from_branch_id.errors %}
+                  <div class="invalid-feedback d-block">{{ err }}</div>
+                {% endfor %}
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-3">
+                {{ form.to_branch_id.label(class='form-label fw-600') }}
+                {{ form.to_branch_id(class='form-select') }}
+                {% for err in form.to_branch_id.errors %}
+                  <div class="invalid-feedback d-block">{{ err }}</div>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            {{ form.medicine_id.label(class='form-label fw-600') }}
+            {{ form.medicine_id(class='form-select',
+                                onchange='document.getElementById(\"transferForm\").submit()') }}
+            {% for err in form.medicine_id.errors %}
+              <div class="invalid-feedback d-block">{{ err }}</div>
+            {% endfor %}
+          </div>
+
+          <div class="mb-3">
+            {{ form.batch_id.label(class='form-label fw-600') }}
+            {{ form.batch_id(class='form-select') }}
+            {% for err in form.batch_id.errors %}
+              <div class="invalid-feedback d-block">{{ err }}</div>
+            {% endfor %}
+          </div>
+
+          <div class="mb-3">
+            {{ form.qty.label(class='form-label fw-600') }}
+            {{ form.qty(class='form-control', placeholder='Quantity to transfer') }}
+            {% for err in form.qty.errors %}
+              <div class="invalid-feedback d-block">{{ err }}</div>
+            {% endfor %}
+          </div>
+
+          <div class="mb-3">
+            {{ form.notes.label(class='form-label fw-600') }}
+            {{ form.notes(class='form-control', rows=2, placeholder='Optional notes…') }}
+          </div>
+
+          {{ form.submit(class='btn btn-primary w-100 fw-600') }}
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h5 class="mb-0 fw-bold">Loyalty Program Settings</h5>
+  <a href="{{ url_for('loyalty.index') }}" class="btn btn-sm btn-outline-secondary">← Back</a>
+</div>
+
+<form method="post">
+  <div class="card mb-3">
+    <div class="card-body row g-3">
+      <div class="col-md-4">
+        <label class="form-label small">Points per ₹1 spent</label>
+        <input type="number" step="0.01" name="points_per_rupee" class="form-control form-control-sm" value="{{ program.points_per_rupee }}">
+      </div>
+      <div class="col-md-4">
+        <label class="form-label small">₹ value per point (redeem)</label>
+        <input type="number" step="0.01" name="rupees_per_point" class="form-control form-control-sm" value="{{ program.rupees_per_point }}">
+      </div>
+      <div class="col-md-4">
+        <label class="form-label small">Minimum points to redeem</label>
+        <input type="number" name="min_redeem_points" class="form-control form-control-sm" value="{{ program.min_redeem_points }}">
+      </div>
+    </div>
+  </div>
+
+  <div class="card mb-3">
+    <div class="card-body">
+      <h6 class="fw-bold mb-3">Membership Tiers</h6>
+      <div class="row g-3">
+        <div class="col-md-4">
+          <label class="form-label small">Gold min spend (₹)</label>
+          <input type="number" step="0.01" name="gold_min_spend" class="form-control form-control-sm" value="{{ program.gold_min_spend }}">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label small">Platinum min spend (₹)</label>
+          <input type="number" step="0.01" name="platinum_min_spend" class="form-control form-control-sm" value="{{ program.platinum_min_spend }}">
+        </div>
+        <div class="col-md-4"></div>
+        <div class="col-md-4">
+          <label class="form-label small">Silver cashback %</label>
+          <input type="number" step="0.01" name="silver_cashback_pct" class="form-control form-control-sm" value="{{ program.silver_cashback_pct }}">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label small">Gold cashback %</label>
+          <input type="number" step="0.01" name="gold_cashback_pct" class="form-control form-control-sm" value="{{ program.gold_cashback_pct }}">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label small">Platinum cashback %</label>
+          <input type="number" step="0.01" name="platinum_cashback_pct" class="form-control form-control-sm" value="{{ program.platinum_cashback_pct }}">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card mb-3">
+    <div class="card-body">
+      <label class="form-label small">Referral bonus points</label>
+      <input type="number" name="referral_bonus_points" class="form-control form-control-sm" style="max-width:200px" value="{{ program.referral_bonus_points }}">
+    </div>
+  </div>
+
+  <button class="btn btn-accent">Save Settings</button>
+</form>
+{% endblock %}

@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h5 class="mb-0 fw-bold">New Sales Return</h5>
+  <a href="{{ url_for('returns.index') }}" class="btn btn-sm btn-outline-secondary">← Back</a>
+</div>
+
+<div class="card mb-3" style="max-width:400px">
+  <div class="card-body">
+    <form method="get">
+      <label class="form-label small fw-semibold">Invoice Number</label>
+      <div class="d-flex gap-2">
+        <input type="text" name="invoice" value="{{ invoice_no }}" class="form-control form-control-sm" placeholder="INV-2026-00001">
+        <button class="btn btn-sm btn-outline-secondary">Find</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% if sale %}
+<div class="card">
+  <div class="card-body">
+    <p class="mb-3"><strong>{{ sale.invoice_number }}</strong> — {{ sale.patient.full_name if sale.patient else 'Walk-in' }} — ₹{{ '{:,.2f}'.format(sale.total_amount) }}</p>
+    <form method="post">
+      <input type="hidden" name="sale_id" value="{{ sale.id }}">
+      <label class="form-label small fw-semibold">Select Item to Return</label>
+      <select name="sale_item_id" class="form-select mb-3" required>
+        {% for item in sale.items %}
+        <option value="{{ item.id }}">{{ item.medicine.name if item.medicine else '' }} — Qty {{ item.quantity }} — ₹{{ '{:,.2f}'.format(item.total_amount) }}</option>
+        {% endfor %}
+      </select>
+      <label class="form-label small fw-semibold">Return Quantity</label>
+      <input type="number" name="quantity" class="form-control mb-3" value="1" min="1">
+      <label class="form-label small fw-semibold">Reason</label>
+      <select name="reason" class="form-select mb-3">
+        {% for r in ['Wrong medicine','Adverse reaction','Customer changed mind','Damaged pack','Expired'] %}
+        <option value="{{ r }}">{{ r }}</option>
+        {% endfor %}
+      </select>
+      <label class="form-label small fw-semibold">Refund Mode</label>
+      <select name="refund_mode" class="form-select mb-3">
+        {% for m in ['cash','card','upi','credit_note'] %}
+        <option value="{{ m }}">{{ m|capitalize }}</option>
+        {% endfor %}
+      </select>
+      <button class="btn btn-accent">Process Return</button>
+    </form>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

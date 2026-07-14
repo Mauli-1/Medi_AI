@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h5 class="mb-0 fw-bold">{{ medicine.name }} — Batches</h5>
+  <a href="{{ url_for('barcode.index') }}" class="btn btn-sm btn-outline-secondary">← Back</a>
+</div>
+
+<form method="post" action="{{ url_for('barcode.print_labels') }}">
+  <div class="card">
+    <div class="table-responsive">
+      <table class="table table-sm table-hover mb-0">
+        <thead class="table-light"><tr><th></th><th>Batch No</th><th>Expiry</th><th class="text-end">Qty</th><th class="text-end">MRP</th></tr></thead>
+        <tbody>
+          {% for b in batches %}
+          <tr>
+            <td><input type="checkbox" name="batch_ids" value="{{ b.id }}"></td>
+            <td class="fw-semibold">{{ b.batch_number }}</td>
+            <td class="small">{{ b.expiry_date.strftime('%d-%m-%Y') if b.expiry_date else '' }}</td>
+            <td class="text-end">{{ b.quantity }}</td>
+            <td class="text-end">₹{{ '{:,.2f}'.format(b.mrp) }}</td>
+          </tr>
+          {% else %}
+          <tr><td colspan="5" class="text-center text-muted py-4">No batches found.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <button class="btn btn-accent mt-3">Print Selected Labels</button>
+</form>
+{% endblock %}

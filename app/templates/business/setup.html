@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+{% block title %}Business Setup — Step {{ step }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Business Setup</h1>
+    <p class="page-subtitle">Configure your pharmacy profile to get started</p>
+  </div>
+</div>
+
+<!-- Step indicator -->
+<div class="d-flex align-items-center gap-2 mb-4" style="max-width:500px;">
+  {% for s in [1,2,3] %}
+  {% set labels = {1:'Basic Info', 2:'Address & Regulatory', 3:'Banking & Features'} %}
+  <div class="d-flex align-items-center gap-2 flex-fill">
+    <div style="
+      width:32px;height:32px;border-radius:50%;
+      display:flex;align-items:center;justify-content:center;
+      font-size:.8125rem;font-weight:700;flex-shrink:0;
+      background:{{ 'var(--accent)' if s == step else ('#E5E7EB' if s > step else 'var(--accent-lt)') }};
+      color:{{ '#fff' if s == step else ('var(--text-muted)' if s > step else 'var(--accent)') }};
+    ">{{ s }}</div>
+    <span style="font-size:.8125rem;font-weight:500;color:{{ 'var(--text)' if s == step else 'var(--text-muted)' }};">
+      {{ labels[s] }}
+    </span>
+    {% if s < 3 %}
+    <div style="flex:1;height:2px;background:{{ 'var(--accent-lt)' if s < step else '#E5E7EB' }};border-radius:2px;"></div>
+    {% endif %}
+  </div>
+  {% endfor %}
+</div>
+
+<div class="card" style="max-width:680px;">
+  <div class="card-header">
+    <span class="card-title">
+      {% if step == 1 %}Basic Information
+      {% elif step == 2 %}Address &amp; Regulatory Details
+      {% else %}Banking, Branding &amp; Features
+      {% endif %}
+    </span>
+    <span class="badge badge-accent">Step {{ step }} of 3</span>
+  </div>
+  <div class="card-body">
+
+    <form method="POST" action="{{ url_for('business.setup', step=step) }}"
+          enctype="multipart/form-data" novalidate>
+      {{ form.hidden_tag() }}
+
+      {% if step == 1 %}
+        <div class="row g-3">
+          <div class="col-12">
+            {% include "business/_field.html" with field=form.name %}
+          </div>
+          <div class="col-md-8">
+            {% include "business/_field.html" with field=form.legal_name %}
+          </div>
+          <div class="col-md-4">
+            {% include "business/_field.html" with field=form.short_name %}
+          </div>
+          <div class="col-md-6">
+            {% include "business/_field.html" with field=form.phone %}
+          </div>
+          <div class="col-md-6">
+            {% include "business/_field.html" with field=form.alt_phone %}
+          </div>
+          <div class="col-md-8">
+            {% include "business/_field.html" with field=form.email %}
+          </div>
+          <div class="col-md-4">
+            {% include "business/_field.html" with field=form.website %}
+          </div>
+          <div class="col-12">
+            {% include "business/_field.html" with field=form.tagline %}
+          </div>
+        </div>
+
+      {% elif step == 2 %}
+        <div class="row g-3">
+          <div class="col-12">
+            {% include "business/_field.html" with field=form.address_line1 %}
+          </div>
+          <div class="col-12">
+            {% include "business/_field.html" with field=form.address_line2 %}
+          </div>
+          <div class="col-md-5">
+            {% include "business/_field.html" with field=form.city %}
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">{{ form.state.label.text }}</label>
+            {{ form.state(class="form-select" + (" is-invalid" if form.state.errors else "")) }}
+            {% for e in form.state.errors %}
+              <div class="invalid-feedback">{{ e }}</div>
+            {% endfor %}
+          </div>
+          <div class="col-md-3">
+            {% include "business/_field.html" with field=form.pincode %}
+          </div>
+          <div class="col-12"><hr style="border-color:var(--border);"></div>
+          <div class="col-md-6">
+            {% include "business/_field.html" with field=form.gstin %}
+          </div>
+          <div class="col-md-6">
+            {% include "business/_field.html" with field=form.pan %}
+          </div>
+          <div class="col-md-6">
+            {% include "business/_field.html" with field=form.drug_license_no %}
+          </div>
+          <div class="col-md-6">
+            {% include "business/_field.html" with field=form.drug_license_no2 %}
+          </div>
+          <div class="col-md-6">
+            {% include "business/_field.html" with field=form.fssai_no %}
+          </div>
+        </div>
+
+      {% elif step == 3 %}
+        <div class="row g-3">
+          <div class="col-md-6">
+            {% include "business/_field.html" with field=form.bank_name %}
+          </div>
+          <div class="col-md-6">
+            {% include "business/_field.html" with field=form.bank_branch %}
+          </div>
+          <div class="col-md-6">
+            {% include "business/_field.html" with field=form.bank_account_no %}
+          </div>
+          <div class="col-md-3">
+            {% include "business/_field.html" with field=form.bank_ifsc %}
+          </div>
+          <div class="col-md-3">
+            {% include "business/_field.html" with field=form.upi_id %}
+          </div>
+          <div class="col-12"><hr style="border-color:var(--border);"></div>
+          <div class="col-md-4">
+            {% include "business/_field.html" with field=form.invoice_prefix %}
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Business Logo</label>
+            {{ form.logo_file(class="form-control") }}
+          </div>
+          <div class="col-12">
+            {% include "business/_field.html" with field=form.invoice_terms textarea=true %}
+          </div>
+          <div class="col-12"><hr style="border-color:var(--border);"></div>
+          <div class="col-12">
+            <div class="form-label fw-600 mb-2">Enable Features</div>
+            <div class="row g-2">
+              {% for f in [form.enable_loyalty, form.enable_whatsapp, form.enable_abha,
+                           form.enable_eprescription, form.enable_barcode, form.enable_sms] %}
+              <div class="col-6 col-md-4">
+                <div class="form-check" style="padding:.5rem .75rem;background:var(--ground);border-radius:8px;">
+                  {{ f(class="form-check-input") }}
+                  <label class="form-check-label" for="{{ f.id }}" style="font-size:.875rem;">
+                    {{ f.label.text }}
+                  </label>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      {% endif %}
+
+      <div class="d-flex justify-content-between mt-4">
+        {% if step > 1 %}
+          <a href="{{ url_for('business.setup', step=step-1) }}" class="btn btn-secondary">
+            &larr; Back
+          </a>
+        {% else %}
+          <div></div>
+        {% endif %}
+        {{ form.submit(class="btn btn-primary") }}
+      </div>
+    </form>
+
+  </div>
+</div>
+{% endblock %}
